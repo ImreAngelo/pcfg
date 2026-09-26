@@ -1,11 +1,9 @@
 use std::env;
-// use std::fs;
-use std::fs::File;
-use std::io::{self, BufRead, BufReader};
-
-use crate::structures::classify;
 
 mod structures;
+mod training;
+
+use training::train;
 
 // Usage: pcfg train <file> <ruleset>
 // Later: pcfg run [ruleset]
@@ -14,44 +12,24 @@ fn main() {
 
     // Assume command is "train" for now
     let command = &args[1];
-    let path = &args[2];
-
+    
     match command.as_str() {
         "train" => {
+            let path = &args[2];
+
+            let _name = if args.len() > 3 {
+                &args[3]
+            } else {
+                path.split("/").last().unwrap_or("default_ruleset")
+            };
+
             train(path).expect("Training failed");
-        }
+        },
+        "run" => {
+            println!("Run command is not yet implemented.");
+        },
         _ => {
             eprintln!("Unknown command: {}", command);
         }
     }
-}
-
-/// 
-fn process_line(line: &str) {
-    println!("Processing line: {}", line);
-    let structures = classify(&line);
-    println!("Classified structures: {:?}", structures);
-}
-
-/// Trains the model using the data from the specified file
-fn train(path: &str) -> io::Result<()> {
-    let file = match File::open(path) {
-        Ok(f) => f,
-        Err(e) => {
-            return Err(io::Error::new(
-                io::ErrorKind::NotFound,
-                format!("File not found: {}. Error: {}", path, e),
-            ));
-        }
-    };
-
-    let mut reader = BufReader::new(file);
-    let mut buf = String::new();
-
-    while reader.read_line(&mut buf)? > 0 {
-        process_line(&buf.trim_end());
-        buf.clear();
-    }
-
-    Ok(())
 }
