@@ -1,5 +1,7 @@
 use std::env;
+use std::path::Path;
 
+mod storage;
 mod structures;
 mod training;
 
@@ -17,13 +19,21 @@ fn main() {
         "train" => {
             let path = &args[2];
 
-            let _name = if args.len() > 3 {
+            let name = if args.len() > 3 {
                 &args[3]
             } else {
                 path.split("/").last().unwrap_or("default_ruleset")
             };
 
-            train(path).expect("Training failed");
+            let terminals = train(path).expect("Training failed");
+
+            let dir = Path::new("rulesets").join(name);
+            storage::save(&terminals, &dir).expect("Saving failed");
+            println!(
+                "Saved {} buckets to {}",
+                terminals.len(),
+                dir.display()
+            );
         },
         "run" => {
             println!("Run command is not yet implemented.");

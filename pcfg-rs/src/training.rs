@@ -7,7 +7,7 @@ use crate::structures::{Structure, classify};
 pub type Terminals = HashMap<(Structure, usize), HashMap<String, u32>>;
 
 /// Trains the model using the data from the specified file
-pub fn train(path: &str) -> io::Result<()> {
+pub fn train(path: &str) -> io::Result<Terminals> {
     let file = match File::open(path) {
         Ok(f) => f,
         Err(e) => {
@@ -34,7 +34,5 @@ pub fn train(path: &str) -> io::Result<()> {
         buf.clear();
     }
 
-    dbg!(terminals);
-
-    Ok(())
+    Ok(terminals)
 }
