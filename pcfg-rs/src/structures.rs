@@ -4,11 +4,11 @@ use logos::Logos;
 
 #[derive(Logos, Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Structure {
-    #[regex(r"\p{L}+")]        // letters (Unicode-aware)
+    #[regex(r"\p{L}+")] // letters (Unicode-aware)
     Letters,
-    #[regex(r"[0-9]+")]        // digits
+    #[regex(r"[0-9]+")] // digits
     Digits,
-    #[regex(r"[^\p{L}0-9]+")]  // anything else
+    #[regex(r"[^\p{L}0-9]+")] // anything else
     Symbols,
 }
 
@@ -18,18 +18,22 @@ pub struct Segment {
     pub length: usize,
 }
 
-/// 
+///
 pub fn classify(line: &str) -> Vec<Segment> {
     let mut lex = Structure::lexer(line);
     let mut structures = Vec::new();
 
     while let Some(token) = lex.next() {
         match token {
-            Ok(structure) => { 
+            Ok(structure) => {
                 let slice = lex.slice().into();
                 let length = lex.slice().chars().count();
-                structures.push(Segment { structure, slice, length }); 
-            },
+                structures.push(Segment {
+                    structure,
+                    slice,
+                    length,
+                });
+            }
             Err(()) => eprintln!("Error: Unrecognized token at position {}", lex.span().start),
         }
     }

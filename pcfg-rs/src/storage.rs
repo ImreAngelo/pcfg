@@ -56,11 +56,7 @@ pub fn save(terminals: &Terminals, dir: &Path) -> io::Result<()> {
 /// This reads the whole FST into memory and streams it into a HashMap. For
 /// large buckets you'd instead memory-map the file and query the `Map`
 /// directly (see `open` below) rather than materializing every entry.
-pub fn load(
-    dir: &Path,
-    structure: Structure,
-    length: usize,
-) -> io::Result<HashMap<String, u32>> {
+pub fn load(dir: &Path, structure: Structure, length: usize) -> io::Result<HashMap<String, u32>> {
     let map = open(dir, structure, length)?;
 
     let mut out = HashMap::new();
