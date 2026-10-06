@@ -15,4 +15,7 @@ pub enum Classification {
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub struct Variable(pub Classification, pub usize);
 
-pub struct Token(pub Variable, pub String);
+pub struct Token<'a>{
+    pub variable: Variable, 
+    pub slice: &'a str
+}

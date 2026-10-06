@@ -4,7 +4,9 @@ use logos::Logos;
 
 use crate::grammar::{Classification, Token, Variable};
 
-pub type Terminals = HashMap<Variable, HashMap<String, u32>>;
+type Occurrences<T> = HashMap<T, u32>;
+type BaseStructure = Vec<Variable>;
+type Terminals = HashMap<Variable, HashMap<String, u32>>;
 
 /// CLASSIFY
 fn classify(line: &str) -> Vec<Token> {
@@ -16,8 +18,11 @@ fn classify(line: &str) -> Vec<Token> {
             Ok(classification) => {
                 let slice = lex.slice().into();
                 let length = lex.slice().chars().count();
-                let var = Variable(classification, length);
-                structures.push(Token (var, slice));
+                let variable = Variable(classification, length);
+                structures.push(Token {
+                    variable, 
+                    slice,
+                });
             }
             Err(()) => eprintln!("Error: Unrecognized token at position {}", lex.span().start),
         }
@@ -33,14 +38,24 @@ pub fn train(path: &str) -> Result<(), io::Error> {
     let mut reader = BufReader::new(file);
     let mut buffer = String::new(); 
 
-    // Final guesses
+    // 
     let mut terminals = Terminals::new();
+    // let mut base_structures: HashMap<BaseStructure, u32> = HashMap::new();
 
     while reader.read_line(&mut buffer)? > 0 {
-        classify(buffer.trim_end()).iter().for_each(|token| {
-            *terminals
-                .entry(token.0).or_default()
-                .entry(token.1.clone()).or_insert(0) += 1;
+        let base = classify(buffer.trim_end());
+        
+        // TODO: Increment base in base_structures 
+
+        base.iter().for_each(|token| {
+            let map = terminals.entry(token.variable).or_default();
+
+            // Only allocate new String if hashmap does not contain one
+            if let Some(count) = map.get_mut(token.slice) {
+                *count += 1;
+            } else {
+                map.insert(token.slice.to_owned(), 1);
+            }
         });
 
         buffer.clear();
