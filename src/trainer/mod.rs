@@ -1,5 +1,6 @@
-use std::{collections::HashMap, eprintln, fs::File};
+use std::{eprintln, fs::File};
 use std::io::{self, BufRead, BufReader};
+use hashbrown::HashMap;
 
 use logos::Logos;
 
@@ -35,20 +36,14 @@ pub fn train(path: &str) -> Result<Terminals, io::Error> {
     // let mut base_structures: Occurrences<BaseStructure> = HashMap::new();
 
     while reader.read_line(&mut buffer)? > 0 {
-        let base = classify(buffer.trim_end());
-        
         // TODO: Increment base in base_structures 
 
-        base.for_each(|token| {
-            let map = terminals.entry(token.variable).or_default();
-
-            // Only allocate new String if hashmap does not contain one
-            if let Some(count) = map.get_mut(token.slice) {
-                *count += 1;
-            } else {
-                map.insert(token.slice.to_owned(), 1);
-            }
-        });
+        for token in classify(buffer.trim_end()) {
+            // Using entry_ref only allocates a new String if hashmap does not already contain it
+            *terminals
+                .entry(token.variable).or_default()
+                .entry_ref(token.slice).or_insert(0) += 1;
+        }
 
         buffer.clear();
     }
