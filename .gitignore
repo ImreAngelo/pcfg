@@ -1,3 +1,6 @@
 .trunk
 /target
 /rulesets
+
+# Only store zipped versions
+/data/*.txt
