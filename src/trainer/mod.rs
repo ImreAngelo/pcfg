@@ -1,16 +1,18 @@
-use std::{eprintln, fs::File};
 use std::io::{self, BufRead, BufReader};
+use std::fs::File;
 use hashbrown::HashMap;
 
 use logos::Logos;
 
-use crate::grammar::{Classification, Token, Variable};
+use crate::grammar::{Classification, Groups, Occurrences, Token, Variable, into_groups};
+use crate::trainer::TrainingError::IOError;
 
-type Occurrences<T> = HashMap<T, u32>;
 type Terminals = HashMap<Variable, Occurrences<String>>;
 // type BaseStructure = Vec<Variable>;
 
-/// CLASSIFY
+// CLASSIFY
+
+/// Returns an iterator of tokens
 fn classify(line: &str) -> impl Iterator<Item = Token<'_>> {
     Classification::lexer(line).spanned().filter_map(|(res, range)| match res {
         Ok(t) => Some(Token {
@@ -24,8 +26,10 @@ fn classify(line: &str) -> impl Iterator<Item = Token<'_>> {
     })
 }
 
-/// TRAIN
-pub fn train(path: &str) -> Result<Terminals, io::Error> {
+// TRAIN
+
+/// Count occurrences of variables and base structures
+fn process_file(path: &str) -> Result<Terminals, io::Error> {
     let file = File::open(path)?;
 
     let mut reader = BufReader::new(file);
@@ -36,7 +40,7 @@ pub fn train(path: &str) -> Result<Terminals, io::Error> {
     // let mut base_structures: Occurrences<BaseStructure> = HashMap::new();
 
     while reader.read_line(&mut buffer)? > 0 {
-        // TODO: Increment base in base_structures 
+        // TODO: Count base structures 
 
         for token in classify(buffer.trim_end()) {
             // Using entry_ref only allocates a new String if hashmap does not already contain it
@@ -48,8 +52,22 @@ pub fn train(path: &str) -> Result<Terminals, io::Error> {
         buffer.clear();
     }
 
-    // TODO: Do something
-    // dbg!(terminals);
-
     Ok(terminals)
+}
+
+/// Group 
+fn group_terminals(terminals: Terminals) -> Result<(), TrainingError> {
+    let group = terminals.into_iter().map(|x| (x.1 as Occurrences<String>).into_groups());
+
+    Ok(())
+}
+
+enum TrainingError {
+    IOError(io::Error),
+}
+
+pub fn train(path: &str) -> Result<(), TrainingError> {
+    let terminals = process_file(path).map_err(IOError);
+
+    Ok(())
 }
