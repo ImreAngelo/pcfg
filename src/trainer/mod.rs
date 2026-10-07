@@ -1,77 +1,28 @@
 use hashbrown::HashMap;
-use std::fs::File;
-use std::io::{self, BufRead, BufReader};
-use std::{format, println};
 
-use logos::Logos;
+use crate::grammar::{Groups, Variable, into_groups};
 
-use crate::grammar::{Classification, Groups, Occurrences, Token, Variable, into_groups};
-use crate::trainer::TrainingError::IOError;
+mod classify;
+mod process;
 
-type Terminals = HashMap<Variable, Occurrences<String>>;
-// type BaseStructure = Vec<Variable>;
+pub fn train(path: &str) -> Result<(HashMap<Variable, Groups<String>>, Groups<Vec<Variable>>), std::io::Error> {
+    let data = process::process_file(path)?; 
 
-// CLASSIFY
+    // Terminals
+    let ts = data.0.into_iter()
+        .map(|(var, occ)| (var, into_groups(occ)))
+        .collect();
 
-/// Returns an iterator of tokens
-fn classify(line: &str) -> impl Iterator<Item = Token<'_>> {
-    Classification::lexer(line)
-        .spanned()
-        .filter_map(|(res, range)| match res {
-            Ok(t) => Some(Token {
-                variable: Variable(t, range.len()),
-                slice: &line[range],
-            }),
-            _ => {
-                // This should never happen
-                eprintln!("Unrecognized token at position {}", range.start);
-                None
-            }
-        })
+    // Base structures
+    let bs = into_groups(data.1);
+
+    Ok((ts, bs))
 }
 
-// TRAIN
-struct TrainingData(Terminals, Occurrences<Vec<Variable>>);
 
-/// Count occurrences of variables and base structures
-fn process_file(path: &str) -> Result<TrainingData, io::Error> {
-    let file = File::open(path)?;
-    
-    let mut reader = BufReader::new(file);
-    
-    // Count variables
-    let mut terminals = Terminals::new();
-    let mut buffer = String::new();
-    
-    // Count base structures
-    let mut base_structures = Occurrences::new();
-    let mut base_buffer = Vec::new();
-
-    while reader.read_line(&mut buffer)? > 0 {
-        for token in classify(buffer.trim_end()) {
-            // Using entry_ref only allocates a new String if hashmap does not already contain it
-            *terminals
-                .entry(token.variable)
-                .or_default()
-                .entry_ref(token.slice)
-                .or_insert(0) += 1;
-
-            // Count base structures
-            base_buffer.push(token.variable);
-        }
-
-        // Again only allocate once per unique base structure
-        *base_structures.entry_ref(base_buffer.as_slice()).or_insert(0) += 1;
-
-        base_buffer.clear();
-        buffer.clear();
-    }
-
-    Ok(TrainingData(terminals, base_structures))
-}
-
-/// Create groups from training data (Vec<Groups<String>>, Vec<Groups<Vec<Variable>>>)
-fn group_data(data: TrainingData) -> () {
+// DEBUG: Create groups from training data
+/*
+fn group_data(data: TrainingData) {
     let x: Vec<(Variable, Groups<String>)> = data.0.into_iter().map(|(var, map)| {
         (var, into_groups(map))
     }).collect();
@@ -117,28 +68,5 @@ fn group_data(data: TrainingData) -> () {
     println!("");
     println!("Found {} groups of variables.", sum);
     println!("Found {} groups of base structures", y.iter().count());
-
-    // (x, y)
 }
-
-fn group_terminals(terminals: Terminals) {
-    // let group = terminals.into_iter().map(|x| into_groups(x.1))...
-    // terminals
-    //     .into_iter()
-    //     .map(|(var, occ)| (var, into_groups(occ)))
-    for (_, occ) in terminals.into_iter() {
-        let x = into_groups(occ);
-        println!("{}", x.iter().count());
-    }
-}
-
-#[derive(Debug)]
-pub enum TrainingError {
-    IOError(io::Error),
-}
-
-pub fn train(path: &str) -> Result<(), TrainingError> {
-    let data = process_file(path).map_err(IOError)?;
-    let groups = group_data(data);
-    Ok(())
-}
+*/

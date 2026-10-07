@@ -18,11 +18,6 @@ pub enum Classification {
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub struct Variable(pub Classification, pub usize);
 
-pub struct Token<'a> {
-    pub variable: Variable,
-    pub slice: &'a str,
-}
-
 /// V2 - Group by occurrence, not by variable
 pub type Occurrences<K> = HashMap<K, u32>;
 /// Each element is grouped by occurrences, so K = Variable or BaseStructure
