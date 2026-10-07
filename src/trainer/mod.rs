@@ -57,7 +57,7 @@ fn process_file(path: &str) -> Result<Terminals, io::Error> {
 
 /// Group 
 fn group_terminals(terminals: Terminals) -> Result<(), TrainingError> {
-    let group = terminals.into_iter().map(|x| (x.1 as Occurrences<String>).into_groups());
+    let group = terminals.into_iter().map(|x| into_groups(x.1));
 
     Ok(())
 }
