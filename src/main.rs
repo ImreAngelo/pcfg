@@ -20,8 +20,8 @@ fn main() {
                 path.split("/").last().unwrap_or("default_ruleset")
             };
 
-            let terminals = trainer::train(path).expect("Training failed");
-            println!("Processed {} unique variables", terminals.iter().count());
+            trainer::train(path).expect("Training failed");
+            // println!("Processed {} unique variables", terminals.iter().count());
         },
         "guess" => {
             println!("Run command is not yet implemented.");
