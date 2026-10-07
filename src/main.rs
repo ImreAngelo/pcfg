@@ -22,6 +22,9 @@ fn main() {
 
             trainer::train(path).expect("Training failed");
             // println!("Processed {} unique variables", terminals.iter().count());
+
+            // TODO: Serialize, in the meantime:
+            // guess()
         },
         "guess" => {
             println!("Run command is not yet implemented.");
