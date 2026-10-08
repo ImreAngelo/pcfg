@@ -1,10 +1,11 @@
 use std::env;
+use std::io::{BufWriter, Write, stdout};
 
 mod grammar;
-// mod guesser;
+mod guesser;
 mod trainer;
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
 
     // Assume command is "train" for now
@@ -20,17 +21,22 @@ fn main() {
                 path.split("/").last().unwrap_or("default_ruleset")
             };
 
-            trainer::train(path).expect("Training failed");
-            // println!("Processed {} unique variables", terminals.iter().count());
+            let model = trainer::train(path).expect("Training failed");
+            println!("Processed {} unique variables", model.terminals().iter().count());
 
             // TODO: Serialize, in the meantime:
-            // guess()
+            let mut out = BufWriter::new(stdout().lock());
+            for guess in guesser::generate(model) {
+                writeln!(out, "{guess}")?; // TODO: Gracefully exit on Ctrl + C exit
+            }
         },
         "guess" => {
-            println!("Run command is not yet implemented.");
+            println!("TODO: Deserialize ruleset.");
         },
         _ => {
             eprintln!("Unknown command: {}", command);
         }
     }
+
+    Ok(())
 }

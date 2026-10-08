@@ -1,24 +1,13 @@
-use hashbrown::HashMap;
-
-use crate::grammar::{Groups, Variable, into_groups};
+use crate::grammar::Model;
 
 mod classify;
+pub mod occurrences;
 mod process;
 
-pub fn train(path: &str) -> Result<(HashMap<Variable, Groups<String>>, Groups<Vec<Variable>>), std::io::Error> {
-    let data = process::process_file(path)?; 
-
-    // Terminals
-    let ts = data.0.into_iter()
-        .map(|(var, occ)| (var, into_groups(occ)))
-        .collect();
-
-    // Base structures
-    let bs = into_groups(data.1);
-
-    Ok((ts, bs))
+pub fn train(path: &str) -> Result<Model, std::io::Error> {
+    let data = process::process_file(path)?;
+    Ok(Model::from(data))
 }
-
 
 // DEBUG: Create groups from training data
 /*
