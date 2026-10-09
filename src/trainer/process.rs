@@ -3,7 +3,7 @@ use std::io::{BufRead, BufReader};
 
 use hashbrown::HashMap;
 
-use crate::grammar::{BaseStructure, Model, Variable};
+use crate::grammar::{BaseStructure, model::Model, Variable};
 use crate::trainer::classify::classify;
 use crate::trainer::occurrences::Occurrences;
 

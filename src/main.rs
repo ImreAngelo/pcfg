@@ -22,11 +22,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
 
             let model = trainer::train(path).expect("Training failed");
-            println!("Processed {} unique variables", model.terminals().iter().count());
+            println!("Processed {} variable groups and {} base structure groups", model.terminals().iter().count(), model.base_structures().iter().count());
 
             // TODO: Serialize, in the meantime:
             let mut out = BufWriter::new(stdout().lock());
-            for guess in guesser::generate(model) {
+            for guess in guesser::generate(model, guesser::Version::V2) {
                 writeln!(out, "{guess}")?; // TODO: Gracefully exit on Ctrl + C exit
             }
         },
