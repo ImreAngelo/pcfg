@@ -24,7 +24,7 @@ pub type Counts<K> = HashMap<K, u32>;
 // }
 
 pub fn into_groups<K>(occ: Counts<K>) -> Groups<K> {
-    // TODO: Use vec / hashmap and sort instead
+    // TODO: vec / hashmap and sort instead gives slower benchmarks for rockyou.txt
     let mut btree: BTreeMap<u32, Vec<K>> = BTreeMap::new();
 
     for (key, count) in occ.into_iter() {

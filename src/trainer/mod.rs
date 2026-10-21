@@ -1,4 +1,5 @@
 use std::io::{self, BufRead};
+use std::convert::Into;
 
 use hashbrown::HashMap;
 
@@ -13,6 +14,18 @@ mod classify;
 pub(crate) struct TrainingData { 
     terminals: HashMap<Variable, Counts<String>>, 
     counts: Counts<BaseStructure>
+}
+
+impl Into<Model> for TrainingData {
+    fn into(self) -> Model {
+        let bases = counts::into_groups(self.counts);
+        let terminals = self.terminals
+            .into_iter()
+            .map(|(var, occ)| (var, counts::into_groups(occ)))
+            .collect();
+
+        Model::new(terminals, bases)
+    }
 }
 
 /// 
@@ -49,17 +62,5 @@ pub fn train(mut reader: impl BufRead) -> io::Result<Model> {
         str_buffer.clear();
     }
     
-    Ok(Model::from(data))
-}
-
-impl Model {
-    pub fn from(data: TrainingData) -> Self {
-        let bases = counts::into_groups(data.counts);
-        let terminals = data.terminals
-            .into_iter()
-            .map(|(var, occ)| (var, counts::into_groups(occ)))
-            .collect();
-
-        Model::new(terminals, bases)
-    }
+    Ok(data.into())
 }
