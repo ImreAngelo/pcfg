@@ -1,6 +1,5 @@
 use crate::grammar::model::Model;
 
-
 pub struct Generator {
     // queue: BinaryHeap<Node>,
     model: Model,
