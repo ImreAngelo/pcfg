@@ -1,5 +1,4 @@
 use std::io::{self, BufRead};
-use std::convert::Into;
 
 use hashbrown::HashMap;
 
@@ -16,10 +15,10 @@ pub(crate) struct TrainingData {
     counts: Counts<BaseStructure>
 }
 
-impl Into<Model> for TrainingData {
-    fn into(self) -> Model {
-        let bases = counts::into_groups(self.counts);
-        let terminals = self.terminals
+impl From<TrainingData> for Model {
+    fn from(data: TrainingData) -> Model {
+        let bases = counts::into_groups(data.counts);
+        let terminals = data.terminals
             .into_iter()
             .map(|(var, occ)| (var, counts::into_groups(occ)))
             .collect();
