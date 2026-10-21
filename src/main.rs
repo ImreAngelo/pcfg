@@ -1,42 +1,55 @@
-use std::env;
-use std::io::{BufWriter, Write, stdout};
+use std::io::{self, BufRead, BufWriter, ErrorKind, Write};
 
 mod grammar;
 mod guesser;
 mod trainer;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args: Vec<String> = env::args().collect();
+fn main() -> io::Result<()> {
+    let args: Vec<String> = std::env::args().collect();
 
-    // Assume command is "train" for now
-    let command = &args[1];
-    
-    match command.as_str() {
-        "train" => {
-            let path = &args[2];
-
-            let _name = if args.len() > 3 {
-                &args[3]
-            } else {
-                path.split("/").last().unwrap_or("default_ruleset")
-            };
-
-            let model = trainer::train(path).expect("Training failed");
+    match (args.get(1).map(String::as_str), args.get(2)) {
+        (Some("train"), Some(data)) => {
+            let file = io::BufReader::new(std::fs::File::open(data)?);
+            let model = trainer::train(file)?;
+            
+            // let model = trainer::train(file.lines().map_while(Result::ok));
             println!("Processed {} variable groups and {} base structure groups", model.terminals().iter().count(), model.base_structures().iter().count());
 
-            // TODO: Serialize, in the meantime:
-            let mut out = BufWriter::new(stdout().lock());
-            for guess in guesser::generate(model) {
-                writeln!(out, "{guess}")?; // TODO: Gracefully exit on Ctrl + C exit
+            for t in model.terminals().iter() {
+                println!(" ----- {:?}: ", t.0);
+                for (count, terminals) in t.1.iter() {
+                    println!("{count}: {:?} ({})", terminals.iter().take(10).collect::<Vec<_>>(), terminals.len());
+                }
+                println!("");
             }
-        },
-        "guess" => {
-            println!("TODO: Deserialize ruleset.");
-        },
+
+            // match print_all(model.guesses()) {
+            //     Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
+            //     other => other,
+            // }
+            
+            // model.save(Path::new("model"))
+            Ok(())
+        }
+        (Some("run"), Some(path)) => {
+            todo!()
+            // let model = model::Model::load(Path::new(path))?;
+            // match print_all(model.guesses()) {
+            //     Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
+            //     other => other,
+            // }
+        }
         _ => {
-            eprintln!("Unknown command: {}", command);
+            eprintln!("usage: myprogram train <data> | run <model>");
+            std::process::exit(2);
         }
     }
-
-    Ok(())
 }
+
+// fn print_all(guesses: impl Iterator<Item = String>) -> io::Result<()> {
+//     let mut out = BufWriter::new(io::stdout().lock());
+//     for g in guesses {
+//         writeln!(out, "{g}")?;
+//     }
+//     out.flush()
+// }

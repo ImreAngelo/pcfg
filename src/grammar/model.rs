@@ -1,3 +1,5 @@
+use std::{io, path::Path};
+
 use hashbrown::HashMap;
 
 use crate::grammar::*;
@@ -21,9 +23,13 @@ impl Model {
         &self.bases
     }
 
-    /// Consume the model, handing back its owned pieces. Lets a generator
-    /// take ownership of the dictionary instead of cloning or borrowing it.
-    pub fn into_parts(self) -> (HashMap<Variable, Groups<String>>, Groups<BaseStructure>) {
-        (self.terminals, self.bases)
-    }
+    // /// Consume the model, handing back its owned pieces. Lets a generator
+    // /// take ownership of the dictionary instead of cloning or borrowing it.
+    // pub fn into_parts(self) -> (HashMap<Variable, Groups<String>>, Groups<BaseStructure>) {
+    //     (self.terminals, self.bases)
+    // }
+    
+    // TODO: Serialize
+    pub fn load(path: &Path) -> io::Result<Model> { todo!() }
+    pub fn save(&self, path: &Path) -> io::Result<()> { todo!() }
 }
