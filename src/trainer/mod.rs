@@ -4,15 +4,15 @@ use hashbrown::HashMap;
 
 use crate::{
     grammar::{BaseStructure, Variable, model::Model}, 
-    trainer::{classify::classify, occurrences::Occurrences}
+    trainer::{classify::classify, counts::Counts}
 };
 
-pub mod occurrences;
+mod counts;
 mod classify;
 
 pub(crate) struct TrainingData { 
-    terminals: HashMap<Variable, Occurrences<String>>, 
-    occurrences: Occurrences<BaseStructure>
+    terminals: HashMap<Variable, Counts<String>>, 
+    counts: Counts<BaseStructure>
 }
 
 /// 
@@ -27,7 +27,7 @@ pub fn process_line(line: &str, data: &mut TrainingData, buffer: &mut Vec<Variab
     }
     
     // Only allocate once per unique base structure with entry_ref
-    *data.occurrences
+    *data.counts
         .entry_ref(buffer.as_slice())
         .or_insert(0) += 1;
 
@@ -38,7 +38,7 @@ pub fn process_line(line: &str, data: &mut TrainingData, buffer: &mut Vec<Variab
 pub fn train(mut reader: impl BufRead) -> io::Result<Model> {
     let mut data = TrainingData {
         terminals: HashMap::new(), 
-        occurrences: HashMap::new()
+        counts: HashMap::new()
     };
 
     let mut base_buffer = Vec::new();
@@ -52,29 +52,12 @@ pub fn train(mut reader: impl BufRead) -> io::Result<Model> {
     Ok(Model::from(data))
 }
 
-/// Returns a Model containing ...
-#[deprecated = "Use train instead"]
-pub fn train_alloc(lines: impl Iterator<Item = String>) -> Model {
-    let mut data = TrainingData {
-        terminals: HashMap::new(), 
-        occurrences: HashMap::new()
-    };
-
-    let mut base_buffer = Vec::new();
-
-    for line in lines {
-        process_line(&line, &mut data, &mut base_buffer);
-    }
-
-    Model::from(data)
-}
-
 impl Model {
     pub fn from(data: TrainingData) -> Self {
-        let bases = occurrences::into_groups(data.occurrences);
+        let bases = counts::into_groups(data.counts);
         let terminals = data.terminals
             .into_iter()
-            .map(|(var, occ)| (var, occurrences::into_groups(occ)))
+            .map(|(var, occ)| (var, counts::into_groups(occ)))
             .collect();
 
         Model::new(terminals, bases)

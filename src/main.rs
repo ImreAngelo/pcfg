@@ -12,7 +12,6 @@ fn main() -> io::Result<()> {
             let file = io::BufReader::new(std::fs::File::open(data)?);
             let model = trainer::train(file)?;
             
-            // let model = trainer::train(file.lines().map_while(Result::ok));
             println!("Processed {} variable groups and {} base structure groups", model.terminals().iter().count(), model.base_structures().iter().count());
 
             for t in model.terminals().iter() {
