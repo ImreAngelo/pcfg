@@ -45,10 +45,10 @@ fn main() -> io::Result<()> {
     }
 }
 
-// fn print_all(guesses: impl Iterator<Item = String>) -> io::Result<()> {
-//     let mut out = BufWriter::new(io::stdout().lock());
-//     for g in guesses {
-//         writeln!(out, "{g}")?;
-//     }
-//     out.flush()
-// }
+fn print_all(guesses: impl Iterator<Item = String>) -> io::Result<()> {
+    let mut out = BufWriter::new(io::stdout().lock());
+    for g in guesses {
+        writeln!(out, "{g}")?;
+    }
+    out.flush()
+}
