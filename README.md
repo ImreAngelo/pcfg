@@ -11,6 +11,7 @@ In order:
 
 * PCFG `next()` v1 and v2
 * Serialize model after training
+* Mask uppercase/lowercase letters
 * Password strength estimation
 
 ## Terminology

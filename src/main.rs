@@ -1,4 +1,6 @@
-use std::io::{self, BufRead, BufWriter, ErrorKind, Write};
+use std::io::{self, BufWriter, ErrorKind, Write};
+
+use crate::guesser::Guesser;
 
 mod grammar;
 mod guesser;
@@ -14,7 +16,15 @@ fn main() -> io::Result<()> {
             
             println!("Processed {} variable groups and {} base structure groups", model.terminals().iter().count(), model.base_structures().iter().count());
 
-            for t in model.terminals().iter() {
+            for t in model.base_structures().iter().take(10) {
+                println!(" ----- Group {:?}: ", t.0);
+                for vars in t.1.iter() {
+                    println!("{:?}", vars.iter().take(10).collect::<Vec<_>>());
+                }
+                println!("");
+            }
+
+            for t in model.terminals().iter().take(2) {
                 println!(" ----- {:?}: ", t.0);
                 for (count, terminals) in t.1.iter() {
                     println!("{count}: {:?} ({})", terminals.iter().take(10).collect::<Vec<_>>(), terminals.len());
@@ -22,13 +32,14 @@ fn main() -> io::Result<()> {
                 println!("");
             }
 
-            // match print_all(model.guesses()) {
-            //     Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
-            //     other => other,
-            // }
+            let guesser = Guesser::from(model);
+            match print_all(guesser) {
+                Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
+                other => other,
+            }
             
             // model.save(Path::new("model"))
-            Ok(())
+            // Ok(())
         }
         (Some("run"), Some(path)) => {
             todo!()
