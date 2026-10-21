@@ -28,7 +28,7 @@ impl From<TrainingData> for Model {
 }
 
 /// 
-pub fn process_line(line: &str, data: &mut TrainingData, buffer: &mut Vec<Variable>) {
+fn process_line(line: &str, data: &mut TrainingData, buffer: &mut Vec<Variable>) {
     for token in classify(&line) {
         *data.terminals
             .entry(token.variable).or_default()
