@@ -19,7 +19,7 @@ impl Generator {
 impl Iterator for Generator {
     type Item = String;
 
-    /// v2
+    /// PCFG algorithm v2
     fn next(&mut self) -> Option<Self::Item> {
         // TODO: base structures list can be iterator in model
         if let Some((size, base_structures_list)) = self.model.base_structures().get(self.base_idx) {
@@ -40,7 +40,4 @@ impl Iterator for Generator {
 
         None
     }
-
-    // /// v1
-    // fn next(&self) -> Option<Self::Item> { None }
 }
