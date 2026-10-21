@@ -26,7 +26,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // TODO: Serialize, in the meantime:
             let mut out = BufWriter::new(stdout().lock());
-            for guess in guesser::generate(model, guesser::Version::V2) {
+            for guess in guesser::generate(model) {
                 writeln!(out, "{guess}")?; // TODO: Gracefully exit on Ctrl + C exit
             }
         },

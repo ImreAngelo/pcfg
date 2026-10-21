@@ -2,7 +2,7 @@ use logos::Logos;
 
 use crate::grammar::{Classification, Variable};
 
-/// ...
+/// Not to be confused with Logos::Token, though functionally the same
 pub struct Token<'a> {
     pub variable: Variable,
     pub slice: &'a str,
