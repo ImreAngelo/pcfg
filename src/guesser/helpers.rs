@@ -13,8 +13,10 @@ type MyType<N, T> = Vec<(N, Vec<T>)>;
 /// Flatten and convert frequency to probability-score/cost
 pub(crate) fn convert_bases(base_structures: Vec<(u32, Vec<Vec<Variable>>)>) -> MyType<u64, Variable> {
     let mut bases = Vec::new();
+    let total = base_structures.iter()
+        .map(|(c, items)| *c as u64 * items.len() as u64).sum();
+    
     for (count, b) in base_structures {
-        let total = (count as u64) * (b.len() as u64);
         let cost = super::cost(count, total);
         for base in b {
             bases.push((cost, base));
@@ -27,16 +29,12 @@ pub(crate) fn convert_bases(base_structures: Vec<(u32, Vec<Vec<Variable>>)>) -> 
 pub(crate) fn convert_terminals(terminals: HashMap<Variable, Vec<(u32, Vec<String>)>>) -> HashMap<Variable, MyType<u64, String>> {
     let mut out = HashMap::<Variable, Vec<(u64, Vec<String>)>>::new();
     for (var, group) in terminals.into_iter() {
-        let total = group.iter().fold(0, |s, x| s + x.0 as u64) * (group.len() as u64);
-        let mut ts = Vec::<(u64, Vec<String>)>::new();
+        let total = group.iter().map(|(c, items)| *c as u64 * items.len() as u64).sum();
+        let groups = group.into_iter()
+            .map(|(count, val)| (super::cost(count, total), val))
+            .collect();
 
-        // iterate group
-        for (count, val) in group.into_iter() {
-            let cost = super::cost(count, total);
-            ts.push((cost, val));
-        }
-
-        out.entry_ref(&var).or_default().extend(ts);
+        out.insert(var, groups);
     }
 
     out
@@ -49,7 +47,7 @@ pub(crate) fn format_base(base: &Vec<Variable>) -> String {
 }
 
 pub(crate) fn print_bases(bases: &Vec<(u64, Vec<Variable>)>) {
-    println!("");
+    println!();
     print!("bases = ");
 
     for x in bases.iter().take(10) {
@@ -60,16 +58,15 @@ pub(crate) fn print_bases(bases: &Vec<(u64, Vec<Variable>)>) {
 
     print!("... ");
     
-    for x in bases.iter().rev().take(2) {
-        print!("({}, {}), ", x.0, format_base(&x.1));
+    for x in bases.iter().rev().take(1) {
+        print!("({}, {})", x.0, format_base(&x.1));
     }
 
-    println!("");
+    println!();
 }
 
 pub(crate) fn print_terminals(terminals: &HashMap<Variable, Vec<(u64, Vec<String>)>>) {
-    println!("");
-    // println!("TERMINALS:");
+    println!();
     
     for (k, v) in terminals.iter().take(8) {
         print!("{}:", k);
@@ -84,5 +81,5 @@ pub(crate) fn print_terminals(terminals: &HashMap<Variable, Vec<(u64, Vec<String
         }
     }
     
-    println!("");
+    println!();
 }
