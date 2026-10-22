@@ -1,4 +1,4 @@
-use std::io::{self, BufWriter, ErrorKind, Write};
+use std::{io::{self, BufWriter, ErrorKind, Write}, path::Path};
 
 use crate::guesser::Guesser;
 
@@ -32,18 +32,12 @@ fn main() -> io::Result<()> {
             //     println!("");
             // }
 
-            let guesser = Guesser::from(model);
-            match print_all(guesser) {
-                Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
-                other => other,
-            }
-            
-            // model.save(Path::new("model"))
-            // Ok(())
+            model.save(Path::new("model"))
         }
         (Some("run"), Some(path)) => {
-            let model = grammar::model::Model::load(std::path::Path::new(path))?;
-            match print_all(Guesser::from(model)) {
+            let model = grammar::model::Model::load(Path::new(path))?;
+            let guesser = Guesser::from(model);
+            match print_all(guesser) {
                 Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
                 other => other,
             }
