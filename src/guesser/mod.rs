@@ -1,37 +1,106 @@
 use std::collections::BinaryHeap;
 
-use crate::grammar::model::Model;
+use hashbrown::HashMap;
 
-const FREQUENCY_INTEGER_SCALE: usize = 1_000_000; 
+use crate::grammar::{BaseStructure, Variable, model::Model};
 
-// 
+const COST_SCALE: f64 = 1_000_000.0; 
+
+/// Lower cost is more probable
+fn cost(count: u32, total: u64) -> u64 {
+    (-(count as f64 / total as f64).ln() * COST_SCALE) as u64
+}
+
+/// 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 struct Node {
-    cost: u64,          // lower = more probable
+    cost: u64,
     base: usize,
     groups: Vec<usize>, // the subscripts: group index per slot
 }
 
-// 
+/// 
 pub struct Guesser {
-    model: Model,
+    bases: Vec<(u64, BaseStructure)>,
+    terminals: HashMap<Variable, Vec<(u64, Vec<String>)>>,
     queue: BinaryHeap<Node>,
     current: Option<Node>,
     size: usize,
     offset: usize,
 }
 
-impl From<Model> for Guesser {
-    fn from(model: Model) -> Self {
-        Guesser { 
-            model, 
-            queue: BinaryHeap::new(), // TODO: add first node to queue
-            current: None,
-            size: 0,
-            offset: 0
+
+
+
+///-------------
+///   HELPERS
+///-------------
+
+/// Flatten and convert frequency to probability-score
+fn convert_bases(base_structures: Vec<(u32, Vec<Vec<Variable>>)>) -> Vec<(u64, Vec<Variable>)> {
+    let mut bases = Vec::new();
+    for (count, b) in base_structures {
+        let total = (count as u64) * (b.len() as u64);
+        let cost = cost(count, total);
+        for base in b {
+            bases.push((cost, base));
         }
     }
+    bases
 }
+
+
+///----------------
+///   CONVERSION
+///----------------
+
+impl From<Model> for Guesser {
+    fn from(model: Model) -> Self {
+        let (bases, terminals) = model.into_parts();
+
+        let bases = convert_bases(bases);
+
+        // Variables
+        let mut terminals = HashMap::new(); // TODO: Keep groupings; have index
+        for (var, group) in model.terminals().into_iter() {
+            let total = group.iter().fold(0, |s, x| s + x.0 as u64) * (group.len() as u64);
+
+            // iterate group
+            for (count, val) in group {
+                let cost = cost(*count, total);
+                terminals
+            }
+
+            terminals.entry_ref(var).or_default()
+                .or_insert(0) += ;
+        }
+
+        // First node
+        let mut queue = BinaryHeap::new();
+        queue.push(Node {
+            cost: 1000,
+            base: 0,
+            groups: vec![0; bases[0].1.len()]
+        });
+
+        todo!()
+        // Guesser { 
+        //     bases,
+        //     terminals, 
+        //     queue,
+        //     current: None,
+        //     size: 0,
+        //     offset: 0
+        // }
+    }
+}
+
+
+
+
+///--------------------
+///   IMPLEMENTATION
+///--------------------
 
 impl Iterator for Guesser {
     type Item = String;
@@ -46,7 +115,7 @@ impl Iterator for Guesser {
             let remaining = self.size - self.offset;
             if n < remaining {
                 self.offset += n;
-                let guess = self.build_guess();   // decode (current, offset)
+                let guess = self.next_cartesian();
                 self.offset += 1;
                 return Some(guess);
             }
@@ -57,11 +126,27 @@ impl Iterator for Guesser {
 }
 
 impl Guesser {
-    fn build_guess(&self) -> String {
+    ///
+    fn node_cost(&self, base: usize, groups: &[usize]) -> u64 {
+        todo!()
+    }
+
+    ///
+    fn node_size(&self, node: &Node) -> usize {
+        todo!()
+    }
+    
+    /// Return the next element in the cartesian product of current group.
+    /// Increments offset.
+    fn next_cartesian(&self) -> String {
         todo!() 
     }
 
-    fn advance_node(&self) -> Option<Node> {
+    fn advance_node(&mut self) -> Option<Node> {
+        todo!()
+    }
+
+    fn is_adopter(&self, popped: &Node, child: &Node) -> bool {
         todo!()
     }
 }

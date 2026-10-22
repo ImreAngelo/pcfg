@@ -22,6 +22,12 @@ impl Model {
     pub fn base_structures(&self) -> &Groups<BaseStructure> {
         &self.bases
     }
+
+    // /// Consume the model, handing back its owned pieces. Lets a generator
+    // /// take ownership of the dictionary instead of cloning or borrowing it.
+    pub fn into_parts(self) -> (Groups<BaseStructure>, HashMap<Variable, Groups<String>>) {
+        (self.bases, self.terminals)
+    }
     
     // TODO: Serialize
     pub fn load(path: &Path) -> io::Result<Model> { todo!() }
