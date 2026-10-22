@@ -8,3 +8,10 @@ hashbrown = "0.17.1"
 logos = "0.16.1"
 postcard = "1.1.3"
 serde = "1.0.229"
+
+[profile.release]
+opt-level="s"
+codegen-units = 1
+panic = "abort"
+strip = true
+lto = true
