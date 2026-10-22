@@ -1,4 +1,4 @@
-use std::{io::{self, BufWriter, ErrorKind, Write}, path::Path};
+use std::{io::{self, Write}, path::Path};
 
 use crate::guesser::Guesser;
 
@@ -13,32 +13,13 @@ fn main() -> io::Result<()> {
         (Some("train"), Some(data)) => {
             let file = io::BufReader::new(std::fs::File::open(data)?);
             let model = trainer::train(file)?;
-            
-            println!("Processed {} variable groups and {} base structure groups", model.terminals().iter().count(), model.base_structures().iter().count());
-
-            // for t in model.base_structures().iter().take(10) {
-            //     println!(" ----- Group {:?}: ", t.0);
-            //     for vars in t.1.iter() {
-            //         println!("{:?}", vars.iter().take(10).collect::<Vec<_>>());
-            //     }
-            //     println!("");
-            // }
-
-            // for t in model.terminals().iter().take(2) {
-            //     println!(" ----- {:?}: ", t.0);
-            //     for (count, terminals) in t.1.iter() {
-            //         println!("{count}: {:?} ({})", terminals.iter().take(10).collect::<Vec<_>>(), terminals.len());
-            //     }
-            //     println!("");
-            // }
-
             model.save(Path::new("model"))
         }
         (Some("run"), Some(path)) => {
             let model = grammar::model::Model::load(Path::new(path))?;
             let guesser = Guesser::from(model);
             match print_all(guesser) {
-                Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
+                Err(e) if e.kind() == io::ErrorKind::BrokenPipe => Ok(()),
                 other => other,
             }
         }
@@ -50,7 +31,7 @@ fn main() -> io::Result<()> {
 }
 
 fn print_all(guesses: impl Iterator<Item = String>) -> io::Result<()> {
-    let mut out = BufWriter::new(io::stdout().lock());
+    let mut out = io::BufWriter::new(io::stdout().lock());
     for g in guesses {
         writeln!(out, "{g}")?;
     }
