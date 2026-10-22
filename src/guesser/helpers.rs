@@ -1,3 +1,5 @@
+use std::{cmp::Reverse, collections::BinaryHeap};
+
 use hashbrown::HashMap;
 
 use crate::grammar::Variable;
@@ -15,7 +17,7 @@ pub(crate) fn convert_bases(base_structures: Vec<(u32, Vec<Vec<Variable>>)>) -> 
     let mut bases = Vec::new();
     let total = base_structures.iter()
         .map(|(c, items)| *c as u64 * items.len() as u64).sum();
-    
+
     for (count, b) in base_structures {
         let cost = super::cost(count, total);
         for base in b {
@@ -38,6 +40,23 @@ pub(crate) fn convert_terminals(terminals: HashMap<Variable, Vec<(u32, Vec<Strin
     }
 
     out
+}
+
+/// Build initial priority queue
+pub(crate) fn populate_queue(bases: &Vec<(u64, Vec<Variable>)>, terminals: &HashMap<Variable, Vec<(u64, Vec<String>)>>) -> BinaryHeap<Reverse<super::Node>> {
+    let mut q = BinaryHeap::new();
+    for (c, structure) in bases.iter() {
+        let slots = structure.len();
+        let cost = c + structure.iter()
+            .fold(0, |s, k| s + terminals[k][0].0);
+        
+        q.push(Reverse(super::Node {
+            cost,
+            base: 0,
+            groups: vec![0; slots]
+        }));
+    }
+    q
 }
 
 /// Pretty print

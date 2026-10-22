@@ -41,29 +41,19 @@ impl From<Model> for Guesser {
     fn from(model: Model) -> Self {
         let (base_structures, terminals) = model.into_parts();
         
-        // TODO: Optimize model layout if possible
+        // TODO: Optimize model data structure if possible
         let bases = helpers::convert_bases(base_structures);
         let terminals = helpers::convert_terminals(terminals);
         
         helpers::print_bases(&bases);
         helpers::print_terminals(&terminals);
 
-        // First node
-        let mut queue = BinaryHeap::new();
+        // Process root (S) node -> Add all children (most likely base structures)
+        let queue = helpers::populate_queue(&bases, &terminals);
 
-        let (c, structure) = &bases[0];
-        let slots = structure.len();
-
-        let cost = c + structure.iter()
-            .fold(0, |s, k| s + terminals[k][0].0);
-
-        queue.push(Reverse(Node {
-            cost,
-            base: 0,
-            groups: vec![0; slots]
-        }));
-
-        println!("{:?}", queue.peek().unwrap());
+        // TODO: Standardized unit testing
+        println!("Queue starts with {:?}", queue.peek().unwrap());
+        assert_eq!(queue.len(), bases.len());
 
         Guesser { 
             bases,
@@ -107,7 +97,12 @@ impl Iterator for Guesser {
 impl Guesser {
     ///
     fn node_cost(&self, base: usize, groups: &[usize]) -> u64 {
-        todo!()
+        if let Some(ref n) = self.current {
+            // n.cost, n.base, &n.groups
+            // n.cost + 
+        }
+
+        0
     }
 
     ///
@@ -121,11 +116,11 @@ impl Guesser {
         todo!() 
     }
 
-    fn advance_node(&mut self) -> Option<Node> {
+    fn is_adopter(&self, popped: &Node, child: &Node) -> bool {
         todo!()
     }
-
-    fn is_adopter(&self, popped: &Node, child: &Node) -> bool {
+    
+    fn advance_node(&mut self) -> Option<Node> {
         todo!()
     }
 }

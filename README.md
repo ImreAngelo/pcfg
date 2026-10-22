@@ -3,7 +3,7 @@ A rust implementation of password guessing and generation based on PCFG.
 
 ```sh
 pcfg train <list_of_passwords.txt> [-o "ruleset name"]  # Train
-pcfg guess [-r "ruleset name"]           # Generate new guesses
+pcfg run [-r "ruleset name"]             # Generate new guesses
 ```
 
 ## Future work
