@@ -1,10 +1,12 @@
-use std::{io, path::Path};
+use std::{fs, io, path::Path};
 
 use hashbrown::HashMap;
+use serde::{Deserialize, Serialize};
 
 use crate::grammar::*;
 
-/// Contains the fully parsed and processed model data
+/// Contains the training data compacted
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 pub struct Model {
     terminals: HashMap<Variable, Groups<String>>,
     bases: Groups<BaseStructure>,
@@ -29,7 +31,16 @@ impl Model {
         (self.bases, self.terminals)
     }
     
-    // TODO: Serialize
-    pub fn load(path: &Path) -> io::Result<Model> { todo!() }
-    pub fn save(&self, path: &Path) -> io::Result<()> { todo!() }
+    /// Load model from file at path
+    pub fn load(path: &Path) -> io::Result<Model> {
+        postcard::from_bytes(&fs::read(path)?).map_err(io::Error::other)
+    }
+
+    /// Save model to file at path
+    pub fn save(&self, path: &Path) -> io::Result<()> {
+        let inner = fs::File::create(path)?;
+        let writer = io::BufWriter::new(inner);
+        postcard::to_io(self, writer).map_err(io::Error::other)?;
+        Ok(())
+    }
 }

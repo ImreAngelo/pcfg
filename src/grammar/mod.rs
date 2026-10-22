@@ -1,8 +1,9 @@
 use logos::Logos;
+use serde::{Deserialize, Serialize};
 
 pub mod model;
 
-#[derive(Logos, PartialEq, Eq, Hash, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, Logos, PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub enum Classification {
     #[regex(r"\p{L}+")] // Unicode-aware
     Alpha,
@@ -14,7 +15,7 @@ pub enum Classification {
     Special,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub struct Variable(pub Classification, pub usize);
 
 /// Each element is grouped by occurrences, so K = Variable or BaseStructure
