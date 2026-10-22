@@ -16,21 +16,21 @@ fn main() -> io::Result<()> {
             
             println!("Processed {} variable groups and {} base structure groups", model.terminals().iter().count(), model.base_structures().iter().count());
 
-            for t in model.base_structures().iter().take(10) {
-                println!(" ----- Group {:?}: ", t.0);
-                for vars in t.1.iter() {
-                    println!("{:?}", vars.iter().take(10).collect::<Vec<_>>());
-                }
-                println!("");
-            }
+            // for t in model.base_structures().iter().take(10) {
+            //     println!(" ----- Group {:?}: ", t.0);
+            //     for vars in t.1.iter() {
+            //         println!("{:?}", vars.iter().take(10).collect::<Vec<_>>());
+            //     }
+            //     println!("");
+            // }
 
-            for t in model.terminals().iter().take(2) {
-                println!(" ----- {:?}: ", t.0);
-                for (count, terminals) in t.1.iter() {
-                    println!("{count}: {:?} ({})", terminals.iter().take(10).collect::<Vec<_>>(), terminals.len());
-                }
-                println!("");
-            }
+            // for t in model.terminals().iter().take(2) {
+            //     println!(" ----- {:?}: ", t.0);
+            //     for (count, terminals) in t.1.iter() {
+            //         println!("{count}: {:?} ({})", terminals.iter().take(10).collect::<Vec<_>>(), terminals.len());
+            //     }
+            //     println!("");
+            // }
 
             let guesser = Guesser::from(model);
             match print_all(guesser) {
@@ -42,15 +42,14 @@ fn main() -> io::Result<()> {
             // Ok(())
         }
         (Some("run"), Some(path)) => {
-            todo!()
-            // let model = model::Model::load(Path::new(path))?;
-            // match print_all(model.guesses()) {
-            //     Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
-            //     other => other,
-            // }
+            let model = grammar::model::Model::load(std::path::Path::new(path))?;
+            match print_all(Guesser::from(model)) {
+                Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
+                other => other,
+            }
         }
         _ => {
-            eprintln!("usage: myprogram train <data> | run <model>");
+            eprintln!("usage: pcfg train <data> | run <model>");
             std::process::exit(2);
         }
     }

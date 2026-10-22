@@ -1,18 +1,22 @@
-use std::collections::BinaryHeap;
+use std::{cmp::Reverse, collections::BinaryHeap};
 
 use hashbrown::HashMap;
 
+mod helpers;
+
 use crate::grammar::{BaseStructure, Variable, model::Model};
 
+/// TODO: Load as CLI flag with default value
 const COST_SCALE: f64 = 1_000_000.0; 
 
-/// Lower cost is more probable
+/// Lower cost is more probable.
+/// TODO: Handle f64::INFINITY
 fn cost(count: u32, total: u64) -> u64 {
     (-(count as f64 / total as f64).ln() * COST_SCALE) as u64
 }
 
 /// 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
 struct Node {
     cost: u64,
     base: usize,
@@ -23,32 +27,11 @@ struct Node {
 pub struct Guesser {
     bases: Vec<(u64, BaseStructure)>,
     terminals: HashMap<Variable, Vec<(u64, Vec<String>)>>,
-    queue: BinaryHeap<Node>,
+    queue: BinaryHeap<Reverse<Node>>,
     current: Option<Node>,
     size: usize,
     offset: usize,
 }
-
-
-
-
-///-------------
-///   HELPERS
-///-------------
-
-/// Flatten and convert frequency to probability-score
-fn convert_bases(base_structures: Vec<(u32, Vec<Vec<Variable>>)>) -> Vec<(u64, Vec<Variable>)> {
-    let mut bases = Vec::new();
-    for (count, b) in base_structures {
-        let total = (count as u64) * (b.len() as u64);
-        let cost = cost(count, total);
-        for base in b {
-            bases.push((cost, base));
-        }
-    }
-    bases
-}
-
 
 ///----------------
 ///   CONVERSION
@@ -56,46 +39,42 @@ fn convert_bases(base_structures: Vec<(u32, Vec<Vec<Variable>>)>) -> Vec<(u64, V
 
 impl From<Model> for Guesser {
     fn from(model: Model) -> Self {
-        let (bases, terminals) = model.into_parts();
-
-        let bases = convert_bases(bases);
-
-        // Variables
-        let mut terminals = HashMap::new(); // TODO: Keep groupings; have index
-        for (var, group) in model.terminals().into_iter() {
-            let total = group.iter().fold(0, |s, x| s + x.0 as u64) * (group.len() as u64);
-
-            // iterate group
-            for (count, val) in group {
-                let cost = cost(*count, total);
-                terminals
-            }
-
-            terminals.entry_ref(var).or_default()
-                .or_insert(0) += ;
-        }
+        let (base_structures, terminals) = model.into_parts();
+        
+        // TODO: Optimize model layout if possible
+        let bases = helpers::convert_bases(base_structures);
+        let terminals = helpers::convert_terminals(terminals);
+        
+        helpers::print_bases(&bases);
+        helpers::print_terminals(&terminals);
 
         // First node
         let mut queue = BinaryHeap::new();
-        queue.push(Node {
-            cost: 1000,
-            base: 0,
-            groups: vec![0; bases[0].1.len()]
-        });
 
-        todo!()
-        // Guesser { 
-        //     bases,
-        //     terminals, 
-        //     queue,
-        //     current: None,
-        //     size: 0,
-        //     offset: 0
-        // }
+        let (c, structure) = &bases[0];
+        let slots = structure.len();
+
+        let cost = c + structure.iter()
+            .fold(0, |s, k| s + terminals[k][0].0);
+
+        queue.push(Reverse(Node {
+            cost,
+            base: 0,
+            groups: vec![0; slots]
+        }));
+
+        println!("{:?}", queue.peek().unwrap());
+
+        Guesser { 
+            bases,
+            terminals, 
+            queue,
+            current: None,
+            size: 0,
+            offset: 0
+        }
     }
 }
-
-
 
 
 ///--------------------

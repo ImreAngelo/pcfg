@@ -21,3 +21,17 @@ pub struct Variable(pub Classification, pub usize);
 pub type Groups<K> = Vec<(u32, Vec<K>)>;
 
 pub type BaseStructure = Vec<Variable>;
+
+
+impl std::fmt::Display for Variable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let cls = match self.0 {
+            Classification::Alpha => "A",
+            Classification::Years => "Y",
+            Classification::Digits => "D",
+            Classification::Special => "S",
+        };
+        
+        f.write_fmt(format_args!("{}{}", cls, self.1))
+    }
+}
