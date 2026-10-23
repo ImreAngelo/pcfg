@@ -1,6 +1,6 @@
 use std::{fs::File, io::{self, Write}, path::Path};
 
-use pcfg::grammar::Grammar;
+use pcfg::*;
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = std::env::args().collect();
@@ -8,7 +8,7 @@ fn main() -> io::Result<()> {
     match (args.get(1).map(String::as_str), args.get(2)) {
         (Some("train"), Some(data)) => {
             let file = io::BufReader::new(File::open(data)?);
-            let grammar = pcfg::trainer::train(file)?;
+            let grammar = train(file)?;
             grammar.save(Path::new("model"))
         }
         (Some("run"), Some(path)) => {

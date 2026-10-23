@@ -1,7 +1,23 @@
+use std::collections::BTreeMap;
+
 use hashbrown::HashMap;
 
-use crate::{grammar::*, trainer::{classify::*, counts::*}};
+use crate::{grammar::*, trainer::classify::*};
 
+pub type Counts<K> = HashMap<K, u32>;
+
+/// Invert a hashmap with (key, count) to a group with (count, vector of keys)
+/// NOTE: BTree was faster than unstable_sort'ing a vec for rockyou.txt
+pub fn into_groups<K>(occ: Counts<K>) -> Groups<K, Count> {
+    // TODO: vec / hashmap and sort instead gives slower benchmarks for rockyou.txt
+    let mut btree: BTreeMap<u32, Vec<K>> = BTreeMap::new();
+
+    for (key, count) in occ.into_iter() {
+        btree.entry(count).or_default().push(key);
+    }
+
+    btree.into_iter().rev().collect()
+}
 
 pub(crate) struct TrainingData { 
     pub(crate) terminals: HashMap<Variable, Counts<String>>, 
