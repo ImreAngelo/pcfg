@@ -1,7 +1,7 @@
 use std::{cmp::Reverse, collections::BinaryHeap};
 
+mod adoption;
 mod cost;
-mod iterator;
 mod node;
 
 use crate::{grammar::*, guesser::node::*};
