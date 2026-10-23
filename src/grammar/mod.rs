@@ -5,7 +5,7 @@ use hashbrown::HashMap;
 use serde::{Deserialize, Serialize};
 
 mod display;
-mod serialize;
+mod io;
 
 // ----------------------------------------------------------------------------------------------------------
 // Used by Variable and trainer::classify
