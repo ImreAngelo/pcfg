@@ -95,7 +95,10 @@ impl Iterator for Guesser {
 }
 
 impl Guesser {
-    ///
+    // fn chosen_group(&self, base: usize, groups: &[usize]) -> impl Iterator<Item = &(u64, Vec<String>)> {
+    // } 
+
+    /// 
     fn node_cost(&self, base: usize, groups: &[usize]) -> u64 {
         if let Some(ref n) = self.current {
             // n.cost, n.base, &n.groups

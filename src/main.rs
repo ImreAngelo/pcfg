@@ -1,23 +1,17 @@
 use std::{io::{self, Write}, path::Path};
 
-use crate::guesser::Guesser;
-
-mod grammar;
-mod guesser;
-mod trainer;
-
 fn main() -> io::Result<()> {
     let args: Vec<String> = std::env::args().collect();
 
     match (args.get(1).map(String::as_str), args.get(2)) {
         (Some("train"), Some(data)) => {
             let file = io::BufReader::new(std::fs::File::open(data)?);
-            let model = trainer::train(file)?;
+            let model = pcfg::trainer::train(file)?;
             model.save(Path::new("model"))
         }
         (Some("run"), Some(path)) => {
-            let model = grammar::model::Model::load(Path::new(path))?;
-            let guesser = Guesser::from(model);
+            let model = pcfg::grammar::model::Model::load(Path::new(path))?;
+            let guesser = pcfg::guesser::Guesser::from(model);
             match print_all(guesser) {
                 Err(e) if e.kind() == io::ErrorKind::BrokenPipe => Ok(()),
                 other => other,
