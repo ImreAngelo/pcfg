@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use hashbrown::HashMap;
 
-use crate::grammar::Groups;
+use crate::grammar::{Count, Groups};
 
 /// V2 - Group by occurrence, not by variable
 pub type Counts<K> = HashMap<K, u32>;
@@ -23,7 +23,7 @@ pub type Counts<K> = HashMap<K, u32>;
 //     groups
 // }
 
-pub fn into_groups<K>(occ: Counts<K>) -> Groups<K> {
+pub fn into_groups<K>(occ: Counts<K>) -> Groups<K, Count> {
     // TODO: vec / hashmap and sort instead gives slower benchmarks for rockyou.txt
     let mut btree: BTreeMap<u32, Vec<K>> = BTreeMap::new();
 

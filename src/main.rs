@@ -1,18 +1,20 @@
-use std::{io::{self, Write}, path::Path};
+use std::{fs::File, io::{self, Write}, path::Path};
+
+use pcfg::grammar::Grammar;
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = std::env::args().collect();
 
     match (args.get(1).map(String::as_str), args.get(2)) {
         (Some("train"), Some(data)) => {
-            let file = io::BufReader::new(std::fs::File::open(data)?);
-            let model = pcfg::trainer::train(file)?;
-            model.save(Path::new("model"))
+            let file = io::BufReader::new(File::open(data)?);
+            let grammar = pcfg::trainer::train(file)?;
+            grammar.save(Path::new("model"))
         }
         (Some("run"), Some(path)) => {
-            let model = pcfg::grammar::model::Model::load(Path::new(path))?;
-            let guesser = pcfg::guesser::Guesser::from(model);
-            match print_all(guesser) {
+            let path = Path::new(path);
+            let grammar = Grammar::load(path)?;
+            match print_all(grammar.into_guesses()) {
                 Err(e) if e.kind() == io::ErrorKind::BrokenPipe => Ok(()),
                 other => other,
             }

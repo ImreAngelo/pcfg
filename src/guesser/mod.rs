@@ -1,19 +1,8 @@
 use std::{cmp::Reverse, collections::BinaryHeap};
 
-use hashbrown::HashMap;
-
 mod helpers;
 
-use crate::grammar::{BaseStructure, Variable, model::Model};
-
-/// TODO: Load as CLI flag with default value
-const COST_SCALE: f64 = 1_000_000.0; 
-
-/// Lower cost is more probable.
-/// TODO: Handle f64::INFINITY
-fn cost(count: u32, total: u64) -> u64 {
-    (-(count as f64 / total as f64).ln() * COST_SCALE) as u64
-}
+use crate::{grammar::*, guesser::helpers::*};
 
 /// 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
@@ -24,54 +13,38 @@ struct Node {
 }
 
 /// 
-pub struct Guesser {
-    bases: Vec<(u64, BaseStructure)>,
-    terminals: HashMap<Variable, Vec<(u64, Vec<String>)>>,
+pub struct Guesses {
+    bases: Vec<(Cost, BaseStructure)>, // Groups<Variable, Cost>
+    rules: Rules<Cost>,
     queue: BinaryHeap<Reverse<Node>>,
     current: Option<Node>,
     size: usize,
     offset: usize,
 }
 
-///----------------
-///   CONVERSION
-///----------------
+impl Guesses {
+    fn new(grammar: Grammar<Cost>) -> Self {
+        let (rules, bases) = grammar.into_parts();
+        let bases = helpers::flatten(bases);
 
-impl From<Model> for Guesser {
-    fn from(model: Model) -> Self {
-        let (base_structures, terminals) = model.into_parts();
-        
-        // TODO: Optimize model data structure if possible
-        let bases = helpers::convert_bases(base_structures);
-        let terminals = helpers::convert_terminals(terminals);
-        
-        helpers::print_bases(&bases);
-        helpers::print_terminals(&terminals);
+        let queue = helpers::populate_queue(&bases, &rules);
 
-        // Process root (S) node -> Add all children (most likely base structures)
-        let queue = helpers::populate_queue(&bases, &terminals);
+        Guesses { bases, rules, queue, current: None, size: 0, offset: 0 }
+    }
 
-        // TODO: Standardized unit testing
-        println!("Queue starts with {:?}", queue.peek().unwrap());
-        assert_eq!(queue.len(), bases.len());
+}
 
-        Guesser { 
-            bases,
-            terminals, 
-            queue,
-            current: None,
-            size: 0,
-            offset: 0
-        }
+impl Grammar<Count> {
+    pub fn into_guesses(self) -> Guesses {
+        Guesses::new(self.into())
     }
 }
 
+///--------------
+///   ITERATOR
+///--------------
 
-///--------------------
-///   IMPLEMENTATION
-///--------------------
-
-impl Iterator for Guesser {
+impl Iterator for Guesses {
     type Item = String;
 
     /// PCFG next v2 (adoption algorithm)
@@ -94,7 +67,7 @@ impl Iterator for Guesser {
     }
 }
 
-impl Guesser {
+impl Guesses {
     // fn chosen_group(&self, base: usize, groups: &[usize]) -> impl Iterator<Item = &(u64, Vec<String>)> {
     // } 
 
