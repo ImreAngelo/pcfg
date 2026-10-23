@@ -1,4 +1,8 @@
-use std::{fs::File, io::{self, Write}, path::Path};
+use std::{
+    fs::File,
+    io::{self, Write},
+    path::Path,
+};
 
 use pcfg::*;
 

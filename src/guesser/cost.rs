@@ -4,7 +4,7 @@
 use crate::grammar::*;
 
 /// TODO: Load as CLI flag with default value
-const COST_SCALE: f64 = 1_000_000.0; 
+const COST_SCALE: f64 = 1_000_000.0;
 
 /// Lower cost is more probable.
 /// TODO: Handle f64::INFINITY
@@ -14,10 +14,15 @@ pub fn cost(count: Count, total: Cost) -> Cost {
 
 /// Convert a grouping by counts to a grouping by costs
 fn to_costs<K>(groups: Groups<K, Count>) -> Groups<K, Cost> {
-    let total = groups.iter().map(|(c, ks)| (*c as u64) * (ks.len() as u64)).sum();
-    groups.into_iter().map(|(c, ks)| (cost(c, total), ks)).collect()
+    let total = groups
+        .iter()
+        .map(|(c, ks)| (*c as u64) * (ks.len() as u64))
+        .sum();
+    groups
+        .into_iter()
+        .map(|(c, ks)| (cost(c, total), ks))
+        .collect()
 }
-
 
 /// TODO: Should this really be placed here?
 impl From<Grammar<Count>> for Grammar<Cost> {

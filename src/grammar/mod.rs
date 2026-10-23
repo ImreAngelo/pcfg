@@ -1,3 +1,6 @@
+//! # Grammar
+//! The trained model is a Probabilitstic Context-Free *Grammar*
+
 use hashbrown::HashMap;
 use serde::{Deserialize, Serialize};
 
@@ -8,7 +11,12 @@ mod serialize;
 // Used by Variable and trainer::classify
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug, Clone, Copy)]
-pub enum Class { Alpha, Years, Digits, Special }
+pub enum Class {
+    Alpha,
+    Years,
+    Digits,
+    Special,
+}
 
 // ----------------------------------------------------------------------------------------------------------
 // Used by trainer, guesser and grammar
@@ -36,8 +44,12 @@ impl<W> Grammar<W> {
         Grammar { rules, bases }
     }
 
-    pub fn rules(&self) -> &Rules<W> { &self.rules }
-    pub fn bases(&self) -> &Groups<BaseStructure, W> { &self.bases }
+    pub fn rules(&self) -> &Rules<W> {
+        &self.rules
+    }
+    pub fn bases(&self) -> &Groups<BaseStructure, W> {
+        &self.bases
+    }
 
     pub fn into_parts(self) -> (Rules<W>, Groups<BaseStructure, W>) {
         (self.rules, self.bases)

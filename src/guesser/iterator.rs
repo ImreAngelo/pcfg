@@ -17,21 +17,21 @@ impl Iterator for Guesses {
                 self.offset += 1;
                 return Some(guess);
             }
-            n -= remaining;                        // skip the rest of this node entirely
-            self.advance_node()?;                  // pop next node, push its children, offset = 0, recompute size
+            n -= remaining; // skip the rest of this node entirely
+            self.advance_node()?; // pop next node, push its children, offset = 0, recompute size
         }
     }
 }
 
 impl Guesses {
     // fn chosen_group(&self, base: usize, groups: &[usize]) -> impl Iterator<Item = &(u64, Vec<String>)> {
-    // } 
+    // }
 
-    /// 
+    ///
     fn node_cost(&self, base: usize, groups: &[usize]) -> u64 {
         if let Some(ref n) = self.current {
             // n.cost, n.base, &n.groups
-            // n.cost + 
+            // n.cost +
         }
 
         0
@@ -41,17 +41,17 @@ impl Guesses {
     fn node_size(&self, node: &Node) -> usize {
         todo!()
     }
-    
+
     /// Return the next element in the cartesian product of current group.
     /// Increments offset.
     fn next_cartesian(&self) -> String {
-        todo!() 
+        todo!()
     }
 
     fn is_adopter(&self, popped: &Node, child: &Node) -> bool {
         todo!()
     }
-    
+
     fn advance_node(&mut self) -> Option<Node> {
         todo!()
     }

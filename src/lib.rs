@@ -1,3 +1,6 @@
+//! # PCFG
+//! ...
+
 mod grammar;
 mod guesser;
 mod trainer;

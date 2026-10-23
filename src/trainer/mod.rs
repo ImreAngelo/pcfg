@@ -4,14 +4,14 @@ use hashbrown::HashMap;
 
 use crate::grammar::*;
 
-mod count;
 mod classify;
+mod count;
 
-/// 
+///
 pub fn train(mut reader: impl BufRead) -> io::Result<Grammar<Count>> {
     let mut data = count::TrainingData {
-        terminals: HashMap::new(), 
-        counts: HashMap::new()
+        terminals: HashMap::new(),
+        counts: HashMap::new(),
     };
 
     let mut base_buffer = Vec::new();
@@ -21,6 +21,6 @@ pub fn train(mut reader: impl BufRead) -> io::Result<Grammar<Count>> {
         count::line(str_buffer.trim_end(), &mut data, &mut base_buffer);
         str_buffer.clear();
     }
-    
+
     Ok(data.into())
 }

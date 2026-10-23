@@ -1,13 +1,14 @@
 /// -- DISPLAY TRAITS
 /// Not used in release mode!
 /// TODO: Convert to impl fmt::Display for ...
-
 use crate::grammar::*;
 
 #[allow(dead_code)]
 pub(crate) fn format_base(base: &BaseStructure) -> String {
-    base.iter().map(|&v| v.to_string())
-        .collect::<Vec<_>>().join(" ")
+    base.iter()
+        .map(|&v| v.to_string())
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 #[allow(dead_code)]
@@ -19,10 +20,12 @@ pub(crate) fn print_bases(bases: &Vec<(Cost, BaseStructure)>) {
         print!("({}, {}), ", x.0, format_base(&x.1));
     }
 
-    if bases.len() <= 10 { return; }
+    if bases.len() <= 10 {
+        return;
+    }
 
     print!("... ");
-    
+
     for x in bases.iter().rev().take(1) {
         print!("({}, {})", x.0, format_base(&x.1));
     }
@@ -33,7 +36,7 @@ pub(crate) fn print_bases(bases: &Vec<(Cost, BaseStructure)>) {
 #[allow(dead_code)]
 pub(crate) fn print_rules(rules: &HashMap<Variable, Vec<(Cost, Vec<String>)>>) {
     println!();
-    
+
     for (k, v) in rules.iter().take(8) {
         print!("{}:", k);
         let dots = String::from("...");
@@ -41,15 +44,16 @@ pub(crate) fn print_rules(rules: &HashMap<Variable, Vec<(Cost, Vec<String>)>>) {
         for (cost, strs) in v.iter().take(3) {
             let cutoff = 4;
             let mut display = strs.iter().take(cutoff).collect::<Vec<_>>();
-            if strs.len() > cutoff { display.push(&dots); };
+            if strs.len() > cutoff {
+                display.push(&dots);
+            };
 
             println!("\t({cost}, {:?})", display);
         }
     }
-    
+
     println!();
 }
-
 
 impl std::fmt::Display for Variable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -59,7 +63,7 @@ impl std::fmt::Display for Variable {
             Class::Digits => "D",
             Class::Special => "S",
         };
-        
+
         f.write_fmt(format_args!("{}{}", cls, self.1))
     }
 }

@@ -2,7 +2,7 @@
 
 use std::{fs, io, path::Path};
 
-use crate::grammar::{Grammar, Count};
+use crate::grammar::{Count, Grammar};
 
 /// Only de/serialize model in the more space-efficient mode
 impl Grammar<Count> {
