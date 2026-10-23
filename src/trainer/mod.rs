@@ -1,25 +1,18 @@
 use std::io::{self, BufRead};
 
-use hashbrown::HashMap;
-
 use crate::grammar::*;
 
 mod classify;
 mod count;
 
-///
+/// Trains a PCFG on the input file
 pub fn train(mut reader: impl BufRead) -> io::Result<Grammar<Count>> {
-    let mut data = count::TrainingData {
-        terminals: HashMap::new(),
-        counts: HashMap::new(),
-    };
+    let mut data = count::TrainingData::default();
+    let mut line = String::new();
 
-    let mut base_buffer = Vec::new();
-    let mut str_buffer = String::new();
-
-    while reader.read_line(&mut str_buffer)? > 0 {
-        count::line(str_buffer.trim_end(), &mut data, &mut base_buffer);
-        str_buffer.clear();
+    while reader.read_line(&mut line)? > 0 {
+        data.add_line(line.trim_end());
+        line.clear();
     }
 
     Ok(data.into())

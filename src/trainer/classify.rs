@@ -8,7 +8,7 @@ enum Classification {
     #[regex(r"(19|20)[0-9][0-9]",   |_| Class::Years)]
     #[regex(r"[0-9]+",              |_| Class::Digits)]
     #[regex(r"[^\p{L}0-9]+",        |_| Class::Special)]
-    Class(Class)
+    Class(Class),
 }
 
 /// Not to be confused with Logos::Token, though functionally the same
@@ -25,8 +25,8 @@ pub fn classify(line: &str) -> impl Iterator<Item = Token<'_>> {
             Ok(Classification::Class(class)) => {
                 let slice = &line[range];
                 let variable = Variable(class, slice.chars().count());
-                Some(Token { variable, slice, })
-            },
+                Some(Token { variable, slice })
+            }
             _ => {
                 // This should never happen
                 eprintln!("Unrecognized token at position {}", range.start);

@@ -1,9 +1,9 @@
-/// -- DISPLAY TRAITS
-/// Not used in release mode!
-/// TODO: Convert to impl fmt::Display for ...
+//! -- DISPLAY TRAITS
+//! Not used in release mode!
+//! TODO: Convert to impl fmt::Display for ...
+
 use crate::grammar::*;
 
-#[allow(dead_code)]
 pub(crate) fn format_base(base: &BaseStructure) -> String {
     base.iter()
         .map(|&v| v.to_string())

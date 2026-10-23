@@ -7,9 +7,6 @@ use serde::{Deserialize, Serialize};
 mod display;
 mod io;
 
-// ----------------------------------------------------------------------------------------------------------
-// Used by Variable and trainer::classify
-
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub enum Class {
     Alpha,
@@ -17,9 +14,6 @@ pub enum Class {
     Digits,
     Special,
 }
-
-// ----------------------------------------------------------------------------------------------------------
-// Used by trainer, guesser and grammar
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub struct Variable(pub Class, pub usize);
@@ -35,7 +29,7 @@ pub type Cost = u64;
 /// Contains the data for the model, grouped by count or by cost
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 pub struct Grammar<W> {
-    rules: HashMap<Variable, Groups<String, W>>, // Rules<W>,
+    rules: Rules<W>, // HashMap<Variable, Groups<String, W>>
     bases: Groups<BaseStructure, W>,
 }
 
@@ -47,6 +41,7 @@ impl<W> Grammar<W> {
     pub fn rules(&self) -> &Rules<W> {
         &self.rules
     }
+
     pub fn bases(&self) -> &Groups<BaseStructure, W> {
         &self.bases
     }

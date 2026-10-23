@@ -1,13 +1,9 @@
-// ----------------------------------------------------------------------------------------------------------
-// Used by guesser and conversion from Grammar<Count> -> Grammar<Cost>
-
 use crate::grammar::*;
 
 /// TODO: Load as CLI flag with default value
 const COST_SCALE: f64 = 1_000_000.0;
 
-/// Lower cost is more probable.
-/// TODO: Handle f64::INFINITY
+/// Lower cost is more probable. TODO: Handle f64::INFINITY
 pub fn cost(count: Count, total: Cost) -> Cost {
     (-(count as f64 / total as f64).ln() * COST_SCALE) as Cost
 }
@@ -24,7 +20,7 @@ fn to_costs<K>(groups: Groups<K, Count>) -> Groups<K, Cost> {
         .collect()
 }
 
-/// TODO: Should this really be placed here?
+/// Convert from stored model (Grammar<Count>) to live model (Grammar<Cost>)
 impl From<Grammar<Count>> for Grammar<Cost> {
     fn from(g: Grammar<Count>) -> Self {
         let (rules, bases) = g.into_parts();

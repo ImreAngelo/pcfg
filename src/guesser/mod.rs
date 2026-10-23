@@ -6,7 +6,7 @@ mod node;
 
 use crate::{grammar::*, guesser::node::*};
 
-///
+/// Iterator for making guesses
 pub struct Guesses {
     bases: Vec<(Cost, BaseStructure)>, // Groups<Variable, Cost>
     rules: Rules<Cost>,

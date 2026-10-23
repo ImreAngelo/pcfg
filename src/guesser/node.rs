@@ -1,9 +1,9 @@
-///
+/// State information used by iterator
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub(crate) struct Node {
     cost: u64,
     base: usize,
-    groups: Vec<usize>, // the subscripts: group index per slot
+    groups: Vec<usize>,
 }
 
 impl Node {
