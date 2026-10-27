@@ -19,7 +19,11 @@ pub struct Guesses {
 impl Guesses {
     fn new(grammar: Grammar<Cost>) -> Self {
         let (rules, bases) = grammar.into_parts();
-        let bases = flatten(bases);
+        let bases = bases
+            .into_iter()
+            .flat_map(|(c, bs)| bs.into_iter().map(move |b| (c, b)))
+            .collect::<Vec<_>>();
+
         let queue = populate_queue(&bases, &rules);
 
         Guesses {
@@ -43,25 +47,17 @@ impl Grammar<Count> {
 ///   HELPERS
 ///--------------
 
-/// Flatten the bases
-pub(crate) fn flatten(bases: Vec<(Cost, Vec<BaseStructure>)>) -> Vec<(Cost, BaseStructure)> {
-    bases
-        .into_iter()
-        .flat_map(|(c, bs)| bs.into_iter().map(move |b| (c, b)))
-        .collect()
-}
-
 /// Build initial priority queue
-pub(crate) fn populate_queue(
-    bases: &Vec<(Cost, BaseStructure)>,
+fn populate_queue(
+    bases: &[(Cost, BaseStructure)],
     rules: &Rules<Cost>,
 ) -> BinaryHeap<Reverse<Node>> {
     let mut q = BinaryHeap::new();
-    for (c, structure) in bases.iter() {
+    for (i, (c, structure)) in bases.iter().enumerate() {
         let slots = structure.len();
         let cost = c + structure.iter().fold(0, |s, k| s + rules[k][0].0);
 
-        let node = Node::new(cost, 0, vec![0; slots]);
+        let node = Node::new(cost, i, vec![0; slots]);
 
         q.push(Reverse(node));
     }

@@ -18,6 +18,9 @@ fn main() -> io::Result<()> {
         (Some("run"), Some(path)) => {
             let path = Path::new(path);
             let grammar = Grammar::load(path)?;
+
+            // TODO: grammar.into_guesses().for_each_guess(|s| writeln!(out, "{g}"))?;
+
             match print_all(grammar.into_guesses()) {
                 Err(e) if e.kind() == io::ErrorKind::BrokenPipe => Ok(()),
                 other => other,
@@ -34,6 +37,7 @@ fn print_all(guesses: impl Iterator<Item = String>) -> io::Result<()> {
     let mut out = io::BufWriter::new(io::stdout().lock());
     for g in guesses {
         writeln!(out, "{g}")?;
+        // out.flush()?; // For debugging
     }
     out.flush()
 }
