@@ -4,3 +4,4 @@
 
 # Only store zipped versions
 /data/*.txt
+.old
