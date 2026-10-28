@@ -1,6 +1,8 @@
 # Probabilistic Context-Free Grammar (PCFG) Guesser
 A rust implementation of password guessing and generation based on PCFG. 
 
+![guesser](../.github/docs/pcfg.gif)
+
 ```sh
 pcfg train <list_of_passwords.txt> [-r "ruleset name"]  # Train
 pcfg run [-r "ruleset name"]             # Generate new guesses
@@ -24,10 +26,14 @@ cargo pcfg run <ruleset>
 
 <!-- ### From source -->
 
+## Benchmarks
+
+
 ## Future work
 In order:
 
-* PCFG `next()` v1 and v2
+* Optimize PCFG v2
+* PCFG `next()` v1
 * Mask uppercase/lowercase letters
 * Built-in OMEN nodes
 * Password strength estimation
