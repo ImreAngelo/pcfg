@@ -19,3 +19,17 @@ panic = "abort"
 strip = true
 lto = true
 # rustflags = ["-Zlocation-detail=none", "-Zfmt-debug=none"]
+
+[features]
+# Enables Clone on Grammar (and anything else gated) for tests/benches only.
+testing = []
+
+[dev-dependencies]
+criterion = { version = "0.8", features = ["html_reports"] }
+# Self-dependency trick: enables `testing` automatically during test/bench/example
+# builds via feature unification, without affecting `cargo build`/release.
+pcfg = { path = ".", features = ["testing"] }
+
+[[bench]]
+name = "guessing"
+harness = false
