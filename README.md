@@ -4,7 +4,7 @@
 A rust implementation of password guessing and generation based on PCFG. 
 
 <div align="center">
-<span><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ImreAngelo/pcfg/package.yaml"></span>
+<span><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ImreAngelo/pcfg/package.yaml?label=CI/CD"></span>
 <span><img alt="Crates.io Version" src="https://img.shields.io/crates/v/pcfg"></span>
 <span><img alt="Crates.io Size" src="https://img.shields.io/crates/size/pcfg"></span>
 </div>
