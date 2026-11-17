@@ -42,6 +42,9 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
     steps:
+      - name: Install apt-ftparchive
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq apt-utils
+        
       - name: Build signed apt repo
         run: |
           mkdir -p site/pool && cd site
