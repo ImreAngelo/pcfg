@@ -1,6 +1,5 @@
 #!/bin/sh
-# Adds the pcfg apt repository. Usage:
-#   curl -fsSL https://imreangelo.github.io/pcfg/setup.sh | sudo sh
+# Adds the pcfg apt repository
 set -eu
 
 URL=https://imreangelo.github.io/pcfg

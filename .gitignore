@@ -1,7 +1,4 @@
 .trunk
 /target
-/rulesets
-
-# Only store zipped versions
-/data/*.txt
-.old
+# TODO: Remove all data, maintain via CI/CD
+/data

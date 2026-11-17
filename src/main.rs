@@ -4,12 +4,17 @@ use std::{
     path::Path,
 };
 
+// `BufRead::fill_buf` is only used to sniff the gzip header.
+#[cfg(feature = "gzip")]
+use std::io::BufRead;
+
 use argh::FromArgs;
 
 use pcfg::*;
 
 /// Fast PCFG password cracker.
 #[derive(FromArgs)]
+#[argh(help_triggers("-h", "--help"))]
 struct Cli {
     /// print version and exit
     #[argh(switch, short = 'v')]
@@ -29,7 +34,7 @@ enum Command {
 
 /// Train a model on a (gzipped) text file.
 #[derive(FromArgs)]
-#[argh(subcommand, name = "train")]
+#[argh(subcommand, name = "train", help_triggers("-h", "--help"))]
 struct TrainArgs {
     /// path to (gzipped) text file
     #[argh(positional)]
@@ -42,7 +47,7 @@ struct TrainArgs {
 
 /// Output password guesses from a trained model.
 #[derive(FromArgs)]
-#[argh(subcommand, name = "run")]
+#[argh(subcommand, name = "run", help_triggers("-h", "--help"))]
 struct RunArgs {
     /// path to pcfg model file
     #[argh(positional)]
@@ -113,14 +118,18 @@ fn open_input(path: &str) -> io::Result<Box<dyn io::BufRead>> {
     };
 
     #[cfg(not(feature = "progress"))]
-    let raw: Box<dyn Read> = Box::new(file); // TODO: Custom impl Read that does not use vtable indirection
+    let raw: Box<dyn io::Read> = Box::new(file); // TODO: Custom impl Read that does not use vtable indirection
 
+    // Buffer first so the header can be sniffed without consuming it
+    #[cfg_attr(not(feature = "gzip"), allow(unused_mut))]
+    let mut buffered = io::BufReader::new(raw);
+
+    // Detect gzip by magic bytes (1f 8b) in header
     #[cfg(feature = "gzip")]
-    let raw: Box<dyn io::Read> = if path.extension().is_some_and(|e| e == "gz") {
-        Box::new(flate2::read::GzDecoder::new(raw))
-    } else {
-        raw
-    };
+    if buffered.fill_buf()?.starts_with(&[0x1f, 0x8b]) {
+        let decoder = flate2::read::GzDecoder::new(buffered);
+        return Ok(Box::new(io::BufReader::new(decoder)));
+    }
 
-    Ok(Box::new(io::BufReader::new(raw)))
+    Ok(Box::new(buffered))
 }

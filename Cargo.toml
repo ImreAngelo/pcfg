@@ -3,12 +3,13 @@
 [package]
 name = "pcfg"
 description = "Password cracker using Probabilistic Context-Free Grammars"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/ImreAngelo/pcfg"
 authors = ["Imre Angelo"]
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE*"]
+rust-version = "1.85.1"
 
 [dependencies]
 logos = "0.16.1"
