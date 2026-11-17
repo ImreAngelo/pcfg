@@ -46,12 +46,28 @@ fn open_input(path: &str) -> io::Result<Box<dyn io::BufRead>> {
     let path = Path::new(&path);
     let file = File::open(path)?;
 
-    #[cfg(feature = "gzip")]
-    if path.extension().is_some_and(|e| e == "gz") {
-        return Ok(Box::new(io::BufReader::new(flate2::read::GzDecoder::new(
-            file,
-        ))));
-    }
+    #[cfg(feature = "progress")]
+    let raw: Box<dyn io::Read> = {
+        let len = file.metadata()?.len();
+        let pb = indicatif::ProgressBar::new(len);
+        pb.set_style(
+            indicatif::ProgressStyle::with_template(
+                "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes}/{total_bytes} ({eta})"
+            )
+            .unwrap(),
+        );
+        Box::new(pb.wrap_read(file))
+    };
 
-    Ok(Box::new(io::BufReader::new(file)))
+    #[cfg(not(feature = "progress"))]
+    let raw: Box<dyn Read> = Box::new(file); // TODO: Custom impl Read that does not use vtable indirection
+
+    #[cfg(feature = "gzip")]
+    let raw: Box<dyn io::Read> = if path.extension().is_some_and(|e| e == "gz") {
+        Box::new(flate2::read::GzDecoder::new(raw))
+    } else {
+        raw
+    };
+
+    Ok(Box::new(io::BufReader::new(raw)))
 }

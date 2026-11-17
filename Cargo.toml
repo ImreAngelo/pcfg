@@ -16,10 +16,12 @@ hashbrown = { version = "0.17.1", features = ["serde"] }
 postcard = { version = "1.1.3", features = ["use-std"] }
 serde = { version = "1.0" }
 flate2 = { version = "1.1.11", optional = true }
+indicatif = { version = "0.18.6", optional = true }
 
 [features]
-default = ["gzip"]
+default = ["gzip", "progress"]
 gzip = ["dep:flate2"]
+progress = ["dep:indicatif"]
 # TODO: Check if any point to this... Enables Clone on Grammar (and anything else gated) for tests/benches only.
 testing = []
 
