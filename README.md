@@ -10,11 +10,21 @@ pcfg run [-r "ruleset name"]             # Generate new guesses
 
 ## Installation
 
-<!-- ### Kali Linux / Ubuntu 24.04
+### Kali Linux / Ubuntu 24.04
 ```sh
-# TODO: install private package repo, then
+sudo curl -fsSL https://you.github.io/myapp/key.asc -o /etc/apt/keyrings/myapp.asc
+
+sudo tee /etc/apt/sources.list.d/pcfg.sources > /dev/null <<'EOF'
+Types: deb
+URIs: https://imreangelo.github.io/pcfg
+Suites: stable
+Components: main
+Signed-By: /etc/apt/keyrings/pcfg.asc
+EOF
+
+sudo apt update
 sudo apt install pcfg
-``` -->
+```
 
 ### Cargo
 The package contains a library crate for training and running trained models, and a binary crate that can be installed and run as:
