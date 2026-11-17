@@ -17,7 +17,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: v
         name: Is this version released yet?
         run: |
@@ -36,8 +36,8 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       TAG: ${{ needs.version.outputs.tag }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: taiki-e/install-action@v2 # cargo-deb is pre-compiled
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: taiki-e/install-action@4a76afe23f9e08d2d9550fb56e556444e8611d21 # cargo-deb is pre-compiled
         with:
           tool: cargo-deb
       - run: cargo deb
@@ -50,8 +50,8 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: rust-lang/crates-io-auth-action@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: rust-lang/crates-io-auth-action@3268eb413133e2960fa4ae0e963ca76380c54cd9 # v1.0.6
         id: auth
       - run: cargo publish
         env:
@@ -72,7 +72,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
     steps:
-      - uses: actions/checkout@v7 # to checkout setup.sh
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # to checkout setup.sh
 
       - name: Install apt-ftparchive
         run: sudo apt-get update -qq && sudo apt-get install -y -qq apt-utils
@@ -103,8 +103,8 @@ jobs:
           gpg --armor --export > key.asc
           cp ../scripts/setup.sh .
 
-      - uses: actions/upload-pages-artifact@v5
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: site
       - id: deploy
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
