@@ -1,8 +1,16 @@
+<!-- ![guesser](../.github/docs/pcfg.gif) -->
+
 # Probabilistic Context-Free Grammar (PCFG) Guesser
 A rust implementation of password guessing and generation based on PCFG. 
 
-![guesser](../.github/docs/pcfg.gif)
+<div align="center">
+<span><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ImreAngelo/pcfg/package.yaml"></span>
+<span><img alt="Crates.io Version" src="https://img.shields.io/crates/v/pcfg"></span>
+<span><img alt="Crates.io Size" src="https://img.shields.io/crates/size/pcfg"></span>
+</div>
 
+
+## Usage
 ```sh
 pcfg train <list_of_passwords.txt> [-r "ruleset name"]  # Train
 pcfg run [-r "ruleset name"]             # Generate new guesses
@@ -10,21 +18,22 @@ pcfg run [-r "ruleset name"]             # Generate new guesses
 
 ## Installation
 
-<!-- ### Kali Linux / Ubuntu 24.04
+### Kali Linux / Ubuntu 24.04
 ```sh
-# TODO: install private package repo, then
+curl -fsSL https://imreangelo.github.io/pcfg/setup.sh | sudo sh
+
+sudo apt update
 sudo apt install pcfg
-``` -->
+```
 
 ### Cargo
-The package contains a library crate for training and running trained models, and a binary crate that can be installed and run as:
+The package contains a library crate for training and running trained models, and a binary crate that can be installed and run via cargo:
 ```sh
 cargo install pcfg
 cargo pcfg train <file> -r ruleset
 cargo pcfg run <ruleset>
 ```
 
-<!-- ### From source -->
 
 ## Benchmarks
 
@@ -40,4 +49,5 @@ In order:
 * Approximate probability order
 
 ## References
-[1] M. Weir, S. Aggarwal, B. d. Medeiros and B. Glodek, "Password Cracking Using Probabilistic Context-Free Grammars," 2009 30th IEEE Symposium on Security and Privacy, Oakland, CA, USA, 2009, pp. 391-405, doi: 10.1109/SP.2009.8
+- [1] M. Weir, S. Aggarwal, B. d. Medeiros and B. Glodek, "Password Cracking Using Probabilistic Context-Free Grammars," 2009 30th IEEE Symposium on Security and Privacy, Oakland, CA, USA, 2009, pp. 391-405, doi: 10.1109/SP.2009.8
+- [2] https://github.com/lakiw/pcfg_cracker
