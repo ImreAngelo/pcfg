@@ -26,6 +26,10 @@ fn main() -> io::Result<()> {
                 other => other,
             }
         }
+        (Some("-v"), _) => {
+            println!("Version 0.1.5");
+            std::process::exit(0);
+        }
         _ => {
             eprintln!("usage: pcfg train <data> | run <model>");
             std::process::exit(2);
