@@ -15,7 +15,7 @@ jobs:
       tag: ${{ steps.v.outputs.tag }}
       new: ${{ steps.v.outputs.new }}
     env:
-      GH_TOKeN: ${{ github.token }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
       - id: v
@@ -81,8 +81,9 @@ jobs:
         run: |
           mkdir -p site/pool && cd site
 
-          # Last 10 releases
-          for tag in $(gh release list -R "$GITHUB_REPOSITORY" --limit 10 --json tagName -q '.[].tagName'); do
+          # Last 10 .deb releases
+          for tag in $(gh release list -R "$GITHUB_REPOSITORY" --limit 10 --json tagName,isPrerelease \
+            -q '.[] | select(.tagName | startswith("v")) | select(.isPrerelease | not) | .tagName'); do
             gh release download "$tag" -R "$GITHUB_REPOSITORY" -p '*.deb' -D pool
           done
 
