@@ -2,34 +2,50 @@ name: Package and release
 
 on:
   push:
-    tags: ['v*']
-  workflow_dispatch: # 
+    branches: [main]
+    paths: [Cargo.toml]
+  workflow_dispatch: # for testing
 
 concurrency: release
 
 jobs:
+  version: # Pull semver from Cargo.toml
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.v.outputs.tag }}
+      new: ${{ steps.v.outputs.new }}
+    env:
+      GH_TOKeN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: v
+        name: Is this version released yet?
+        run: |
+          tag="v$(cargo pkgid | sed 's/.*[#@]//')"
+          if gh release view "$tag" > /dev/null 2>&1; then new=false; else new=true; fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "new=$new" >> "$GITHUB_OUTPUT"
+
   release:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-22.04
+    needs: version
+    if: needs.version.outputs.new == 'true'
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     env:
       GH_TOKEN: ${{ github.token }}
+      TAG: ${{ needs.version.outputs.tag }}
     steps:
       - uses: actions/checkout@v7
-      - uses: taiki-e/install-action@v2 #  
+      - uses: taiki-e/install-action@v2 # cargo-deb is pre-compiled
         with:
           tool: cargo-deb
-
-      - name: Check tag matches Cargo.toml
-        run: test "${GITHUB_REF_NAME#v}" = "$(cargo pkgid | sed 's/.*[#@]//')"
-
       - run: cargo deb
-      - run: gh release create "$GITHUB_REF_NAME" target/debian/*.deb --generate-notes
+      - run: gh release create "$TAG" target/debian/*.deb --target "$GITHUB_SHA" --generate-notes
 
   pages:
     needs: release
-    if: ${{ !failure() && !cancelled() }}
+    if: ${{ !cancelled() && !failure() && (needs.release.result == 'success' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -42,7 +58,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7 # to checkout setup.sh
 
       - name: Install apt-ftparchive
         run: sudo apt-get update -qq && sudo apt-get install -y -qq apt-utils
@@ -51,7 +67,7 @@ jobs:
         run: |
           mkdir -p site/pool && cd site
 
-          # Last 10 releases' .debs
+          # Last 10 releases
           for tag in $(gh release list -R "$GITHUB_REPOSITORY" --limit 10 --json tagName -q '.[].tagName'); do
             gh release download "$tag" -R "$GITHUB_REPOSITORY" -p '*.deb' -D pool
           done
@@ -66,7 +82,7 @@ jobs:
             release dists/stable > Release
           mv Release dists/stable/
 
-          # Sign, and publish the public key
+          # Sign, publish the public key and the setup script
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
           gpg --batch --clearsign -o dists/stable/InRelease dists/stable/Release
           gpg --armor --export > key.asc
