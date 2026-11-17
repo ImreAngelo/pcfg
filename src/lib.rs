@@ -1,5 +1,6 @@
-//! # PCFG
-//! ...
+//! > **Probablistic Context-Free Grammar (PCFG) password cracker**
+//!
+//! Description ...
 
 mod grammar;
 mod guesser;

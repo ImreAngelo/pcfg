@@ -8,11 +8,13 @@ mod count;
 /// Trains a PCFG on the input file
 pub fn train(mut reader: impl BufRead) -> io::Result<Grammar<Count>> {
     let mut data = count::TrainingData::default();
-    let mut line = String::new();
+    let mut buf = Vec::new();
 
-    while reader.read_line(&mut line)? > 0 {
+    // Invalid sequences become U+FFFD, which falls into the `Special` class.
+    while reader.read_until(b'\n', &mut buf)? > 0 {
+        let line = String::from_utf8_lossy(&buf);
         data.add_line(line.trim_end());
-        line.clear();
+        buf.clear();
     }
 
     Ok(data.into())
