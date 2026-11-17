@@ -3,11 +3,11 @@
 # Probabilistic Context-Free Grammar (PCFG) Guesser
 A rust implementation of password guessing and generation based on PCFG. 
 
-<ul style="display:flex justify-contents:center width:100%">
-<li><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ImreAngelo/pcfg/package.yaml">
-<li><img alt="Crates.io Version" src="https://img.shields.io/crates/v/pcfg"></li>
-<li><img alt="Crates.io Size" src="https://img.shields.io/crates/size/pcfg"></li>
-</li>
+<div align="center">
+<span><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ImreAngelo/pcfg/package.yaml"></span>
+<span><img alt="Crates.io Version" src="https://img.shields.io/crates/v/pcfg"></span>
+<span><img alt="Crates.io Size" src="https://img.shields.io/crates/size/pcfg"></span>
+</div>
 
 
 ```sh
