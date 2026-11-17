@@ -1,0 +1,12 @@
+name: Publish apt repo and package
+
+on: 
+    workflow_dispatch:
+    repository_dispatch:
+        types: [package-released]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        # steps:
+        #     - name: ""

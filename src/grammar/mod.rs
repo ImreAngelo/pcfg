@@ -27,7 +27,9 @@ pub type Count = u32;
 pub type Cost = u64;
 
 /// Contains the data for the model, grouped by count or by cost
+/// NOTE: Clone is only derived for test/bench builds (feature = "testing")
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "testing", derive(Clone))]
 pub struct Grammar<W> {
     rules: Rules<W>, // HashMap<Variable, Groups<String, W>>
     bases: Groups<BaseStructure, W>,

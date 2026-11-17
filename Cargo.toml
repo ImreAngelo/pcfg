@@ -2,8 +2,10 @@
 
 [package]
 name = "pcfg"
-version = "0.1.0"
+description = "Password cracker using Probabilistic Context-Free Grammars"
+version = "0.1.1"
 edition = "2024"
+license = "MIT"
 
 [dependencies]
 logos = "0.16.1"
@@ -19,3 +21,17 @@ panic = "abort"
 strip = true
 lto = true
 # rustflags = ["-Zlocation-detail=none", "-Zfmt-debug=none"]
+
+[features]
+# Enables Clone on Grammar (and anything else gated) for tests/benches only.
+testing = []
+
+[dev-dependencies]
+criterion = { version = "0.8", features = ["html_reports"] }
+# Self-dependency trick: enables `testing` automatically during test/bench/example
+# builds via feature unification, without affecting `cargo build`/release.
+pcfg = { path = ".", features = ["testing"] }
+
+[[bench]]
+name = "guessing"
+harness = false
