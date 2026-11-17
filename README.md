@@ -1,8 +1,16 @@
+<!-- ![guesser](../.github/docs/pcfg.gif) -->
+
 # Probabilistic Context-Free Grammar (PCFG) Guesser
 A rust implementation of password guessing and generation based on PCFG. 
 
-![guesser](../.github/docs/pcfg.gif)
+<div align="center">
+<span><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ImreAngelo/pcfg/package.yaml"></span>
+<span><img alt="Crates.io Version" src="https://img.shields.io/crates/v/pcfg"></span>
+<span><img alt="Crates.io Size" src="https://img.shields.io/crates/size/pcfg"></span>
+</div>
 
+
+## Usage
 ```sh
 pcfg train <list_of_passwords.txt> [-r "ruleset name"]  # Train
 pcfg run [-r "ruleset name"]             # Generate new guesses

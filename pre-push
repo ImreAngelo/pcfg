@@ -1,5 +1,0 @@
-#!/bin/sh
-if ! cargo fmt --check; then
-    echo "Formatting issues found. Run 'cargo fmt' and commit the result." >&2
-    exit 1
-fi
