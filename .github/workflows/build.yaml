@@ -1,8 +1,0 @@
-name: Build apt package and push to releases
-
-on:
-    workflow_dispatch:
-
-jobs:
-    build:
-        

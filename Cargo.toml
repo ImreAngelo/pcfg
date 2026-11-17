@@ -3,9 +3,10 @@
 [package]
 name = "pcfg"
 description = "Password cracker using Probabilistic Context-Free Grammars"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 license = "MIT"
+authors = ["Imre Angelo"]
 
 [dependencies]
 logos = "0.16.1"
@@ -35,3 +36,7 @@ pcfg = { path = ".", features = ["testing"] }
 [[bench]]
 name = "guessing"
 harness = false
+
+# [package.metadata.deb]
+# depends = "$auto"
+# section = "utils"
