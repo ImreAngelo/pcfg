@@ -9,6 +9,7 @@ license = "MIT"
 repository = "https://github.com/ImreAngelo/pcfg"
 authors = ["Imre Angelo"]
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE*"]
+rust-version = "1.85.1"
 
 [dependencies]
 logos = "0.16.1"

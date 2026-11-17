@@ -14,6 +14,7 @@ use pcfg::*;
 
 /// Fast PCFG password cracker.
 #[derive(FromArgs)]
+#[argh(help_triggers("-h", "--help"))]
 struct Cli {
     /// print version and exit
     #[argh(switch, short = 'v')]
@@ -33,7 +34,7 @@ enum Command {
 
 /// Train a model on a (gzipped) text file.
 #[derive(FromArgs)]
-#[argh(subcommand, name = "train")]
+#[argh(subcommand, name = "train", help_triggers("-h", "--help"))]
 struct TrainArgs {
     /// path to (gzipped) text file
     #[argh(positional)]
@@ -46,7 +47,7 @@ struct TrainArgs {
 
 /// Output password guesses from a trained model.
 #[derive(FromArgs)]
-#[argh(subcommand, name = "run")]
+#[argh(subcommand, name = "run", help_triggers("-h", "--help"))]
 struct RunArgs {
     /// path to pcfg model file
     #[argh(positional)]
