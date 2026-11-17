@@ -11,7 +11,7 @@ fn main() -> io::Result<()> {
 
     match (args.get(1).map(String::as_str), args.get(2)) {
         (Some("train"), Some(data)) => {
-            let file = io::BufReader::new(File::open(data)?);
+            let file = open_input(data)?;
             let grammar = train(file)?;
             grammar.save(Path::new("model"))
         }
@@ -40,4 +40,18 @@ fn print_all(guesses: impl Iterator<Item = String>) -> io::Result<()> {
         // out.flush()?; // For debugging
     }
     out.flush()
+}
+
+fn open_input(path: &str) -> io::Result<Box<dyn io::BufRead>> {
+    let path = Path::new(&path);
+    let file = File::open(path)?;
+
+    #[cfg(feature = "gzip")]
+    if path.extension().is_some_and(|e| e == "gz") {
+        return Ok(Box::new(io::BufReader::new(flate2::read::GzDecoder::new(
+            file,
+        ))));
+    }
+
+    Ok(Box::new(io::BufReader::new(file)))
 }
