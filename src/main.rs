@@ -4,19 +4,72 @@ use std::{
     path::Path,
 };
 
+use argh::FromArgs;
+
 use pcfg::*;
 
-fn main() -> io::Result<()> {
-    let args: Vec<String> = std::env::args().collect();
+/// Fast PCFG password cracker.
+#[derive(FromArgs)]
+struct Cli {
+    /// print version and exit
+    #[argh(switch, short = 'v')]
+    version: bool,
 
-    match (args.get(1).map(String::as_str), args.get(2)) {
-        (Some("train"), Some(data)) => {
-            let file = open_input(data)?;
+    /// subcommand: train or run
+    #[argh(subcommand)]
+    command: Option<Command>,
+}
+
+#[derive(FromArgs)]
+#[argh(subcommand)]
+enum Command {
+    Train(TrainArgs),
+    Run(RunArgs),
+}
+
+/// Train a model on a (gzipped) text file.
+#[derive(FromArgs)]
+#[argh(subcommand, name = "train")]
+struct TrainArgs {
+    /// path to (gzipped) text file
+    #[argh(positional)]
+    path: String,
+
+    /// name the model
+    #[argh(option, short = 'n', default = "String::from(\"model\")")]
+    name: String,
+}
+
+/// Output password guesses from a trained model.
+#[derive(FromArgs)]
+#[argh(subcommand, name = "run")]
+struct RunArgs {
+    /// path to pcfg model file
+    #[argh(positional)]
+    path: String,
+}
+
+// TODO: Do not return io::Result
+fn main() -> io::Result<()> {
+    let cli: Cli = argh::from_env();
+
+    if cli.version {
+        println!(
+            "{} version {}",
+            env!("CARGO_PKG_NAME"),
+            env!("CARGO_PKG_VERSION")
+        );
+        return Ok(());
+    }
+
+    match cli.command {
+        Some(Command::Train(args)) => {
+            let file = open_input(&args.path)?;
             let grammar = train(file)?;
-            grammar.save(Path::new("model"))
+            grammar.save(Path::new(&args.name))
         }
-        (Some("run"), Some(path)) => {
-            let path = Path::new(path);
+        Some(Command::Run(args)) => {
+            let path = Path::new(&args.path);
             let grammar = Grammar::load(path)?;
 
             // TODO: grammar.into_guesses().for_each_guess(|s| writeln!(out, "{g}"))?;
@@ -26,12 +79,8 @@ fn main() -> io::Result<()> {
                 other => other,
             }
         }
-        (Some("-v"), _) => {
-            println!("Version 0.1.5");
-            std::process::exit(0);
-        }
-        _ => {
-            eprintln!("usage: pcfg train <data> | run <model>");
+        None => {
+            eprintln!("No command given. Try --help.");
             std::process::exit(2);
         }
     }
