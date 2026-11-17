@@ -1,0 +1,73 @@
+name: Package and release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch: # 
+
+concurrency: release
+
+jobs:
+  release:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: taiki-e/install-action@v2 #  
+        with:
+          tool: cargo-deb
+
+      - name: Check tag matches Cargo.toml
+        run: test "${GITHUB_REF_NAME#v}" = "$(cargo pkgid | sed 's/.*[#@]//')"
+
+      - run: cargo deb
+      - run: gh release create "$GITHUB_REF_NAME" target/debian/*.deb --generate-notes
+
+  pages:
+    needs: release
+    if: ${{ !failure() && !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+    steps:
+      - name: Build signed apt repo
+        run: |
+          mkdir -p site/pool && cd site
+
+          # Last 10 releases' .debs
+          for tag in $(gh release list -R "$GITHUB_REPOSITORY" --limit 10 --json tagName -q '.[].tagName'); do
+            gh release download "$tag" -R "$GITHUB_REPOSITORY" -p '*.deb' -D pool
+          done
+
+          # Index
+          mkdir -p dists/stable/main/binary-amd64
+          apt-ftparchive packages pool > dists/stable/main/binary-amd64/Packages
+          apt-ftparchive \
+            -o APT::FTPArchive::Release::Codename=stable \
+            -o APT::FTPArchive::Release::Components=main \
+            -o APT::FTPArchive::Release::Architectures=amd64 \
+            release dists/stable > Release
+          mv Release dists/stable/
+
+          # Sign, and publish the public key
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --batch --clearsign -o dists/stable/InRelease dists/stable/Release
+          gpg --armor --export > key.asc
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v5
