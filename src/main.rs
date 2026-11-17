@@ -123,7 +123,7 @@ fn open_input(path: &str) -> io::Result<Box<dyn io::BufRead>> {
     #[cfg_attr(not(feature = "gzip"), allow(unused_mut))]
     let mut buffered = io::BufReader::new(raw);
 
-    // Detect gzip by magic bytes (1f 8b)
+    // Detect gzip by magic bytes (1f 8b) in header
     #[cfg(feature = "gzip")]
     if buffered.fill_buf()?.starts_with(&[0x1f, 0x8b]) {
         let decoder = flate2::read::GzDecoder::new(buffered);
