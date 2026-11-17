@@ -2,8 +2,10 @@
 
 [package]
 name = "pcfg"
-version = "0.1.0"
+description = "Password cracker using Probabilistic Context-Free Grammars"
+version = "0.1.1"
 edition = "2024"
+license = "MIT"
 
 [dependencies]
 logos = "0.16.1"
