@@ -44,7 +44,7 @@ jobs:
     steps:
       - name: Install apt-ftparchive
         run: sudo apt-get update -qq && sudo apt-get install -y -qq apt-utils
-        
+
       - name: Build signed apt repo
         run: |
           mkdir -p site/pool && cd site
@@ -68,6 +68,7 @@ jobs:
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
           gpg --batch --clearsign -o dists/stable/InRelease dists/stable/Release
           gpg --armor --export > key.asc
+          cp ../scripts/setup.sh .
 
       - uses: actions/upload-pages-artifact@v5
         with:
